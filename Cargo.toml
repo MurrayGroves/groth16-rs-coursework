@@ -1,0 +1,15 @@
+[package]
+name = "groth16"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+ark-ec = "*"
+ark-mnt6-753 = "*"
+ark-std = "*"
+ark-ff = "*"
+
+ndarray = "*"
+
+rand = "0.9"
+rootcause = "*"
