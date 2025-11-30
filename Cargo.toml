@@ -13,3 +13,4 @@ ndarray = "*"
 
 rand = "0.9"
 rootcause = "*"
+itertools = "*"

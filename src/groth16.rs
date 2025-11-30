@@ -1,21 +1,13 @@
 use crate::circuits::QAP;
 use crate::helpers::rand_scalar;
-use ark_ec::mnt6::{MNT6, MNT6Config};
+use crate::polynomial::Polynomial;
+use ark_ec::PrimeGroup;
 use ark_ec::pairing::Pairing;
-use ark_ec::{CurveGroup, PrimeGroup, ScalarMul, mnt6};
 use ark_ff::fields::Field;
-use ark_ff::{FftField, Fp, MontBackend};
-use ark_mnt6_753::{Fq, Fr, FrConfig, G1Projective, G2Projective, MNT6_753};
-use rand::{RngCore, SeedableRng};
+use itertools::izip;
+use rand::SeedableRng;
 use rootcause::{Report, report};
-use std::borrow::Borrow;
 use std::iter::zip;
-use std::ops::Mul;
-
-// type G1 = G1Projective;
-// type G2 = G2Projective;
-//
-// pub(crate) type Scalar = Fr;
 
 struct Proof<C: Pairing> {
     a: C::G1,
@@ -59,7 +51,7 @@ struct TrustedSetupOutput<C: Pairing> {
 }
 
 impl<C: Pairing> TrustedSetupOutput<C> {
-    fn new(qap: QAP<C::ScalarField>) -> TrustedSetupOutput<C> {
+    fn new(qap: QAP<C::ScalarField>) -> Result<TrustedSetupOutput<C>, Report> {
         let mut rng = rand::rngs::StdRng::from_os_rng();
 
         let alpha: C::ScalarField = rand_scalar(&mut rng);
@@ -72,12 +64,40 @@ impl<C: Pairing> TrustedSetupOutput<C> {
             .rev()
             .map(|i| C::G1::generator() * tau.pow([i as u64]))
             .collect();
+
         let group_2_srs = (0..qap.degree())
             .rev()
             .map(|i| C::G2::generator() * tau.pow([i as u64]))
             .collect();
 
-        TrustedSetupOutput {
+        let t_tau = (1..qap.degree() + 1)
+            .map(|x| tau - C::ScalarField::from(x as u128))
+            .reduce(std::ops::Mul::mul)
+            .ok_or(report!("QAP has degree zero"))?;
+
+        let zero_polynomial_srs = (0..(qap.degree() - 1))
+            .rev()
+            .map(|i| C::G1::generator() * tau.pow([i as u64]) * t_tau)
+            .collect();
+
+        let psi_polynomials = izip!(&qap.u, &qap.v, &qap.w)
+            .enumerate()
+            .map(|(i, (u_i, v_i, w_i))| {
+                let divisor = if i <= qap.public_witness.len() {
+                    gamma
+                } else {
+                    delta
+                };
+
+                C::G1::generator()
+                    * (((v_i.evaluate(tau) * alpha)
+                        + (u_i.evaluate(tau) * beta)
+                        + w_i.evaluate(tau))
+                        / divisor)
+            })
+            .collect();
+
+        Ok(TrustedSetupOutput {
             qap,
             alpha: C::G1::generator() * alpha,
             beta_1: C::G1::generator() * beta,
@@ -87,9 +107,9 @@ impl<C: Pairing> TrustedSetupOutput<C> {
             delta_2: C::G2::generator() * delta,
             group_1_srs,
             group_2_srs,
-            zero_polynomial_srs: Vec::new(),
-            psi_polynomials: Vec::new(),
-        }
+            zero_polynomial_srs,
+            psi_polynomials,
+        })
     }
 
     fn prove(&self, witness: Vec<C::ScalarField>) -> Result<Proof<C>, Report> {
@@ -137,24 +157,36 @@ impl<C: Pairing> TrustedSetupOutput<C> {
             .map(|x| x.evaluate_over_srs(&self.group_1_srs))
             .collect::<Result<Vec<_>, Report>>()?;
 
-        let b_1 = self.beta_1
-            + zip(evaluated_v_1, &witness)
-                .map(|(p, a_i)| p * a_i)
-                .collect::<Vec<_>>()
-                .into_iter()
-                .reduce(std::ops::Add::add)
-                .ok_or(report!("Empty witness"))?
-            + (self.delta_1 * s);
+        let b_sum = zip(evaluated_v_1, &witness)
+            .map(|(p, a_i)| p * a_i)
+            .collect::<Vec<_>>()
+            .into_iter()
+            .reduce(std::ops::Add::add)
+            .ok_or(report!("Empty witness"))?;
+
+        let b_1 = self.beta_1 + b_sum + (self.delta_1 * s);
+
+        let au_sum: Polynomial<C::ScalarField> = zip(&self.qap.u, &witness)
+            .map(|(u_i, a_i)| u_i * *a_i)
+            .sum();
+        let av_sum: Polynomial<C::ScalarField> = zip(&self.qap.v, &witness)
+            .map(|(v_i, a_i)| v_i * *a_i)
+            .sum();
+        let aw_sum: Polynomial<C::ScalarField> = zip(&self.qap.w, &witness)
+            .map(|(w_i, a_i)| w_i * *a_i)
+            .sum();
+        let ht = (au_sum * av_sum) - aw_sum;
+        let ht_tau = ht.evaluate_over_srs(&self.zero_polynomial_srs)?;
 
         let c = zip(&self.psi_polynomials, &witness)
             .skip(self.qap.public_witness.len())
             .map(|(psi, a_i)| *psi * a_i)
             .reduce(std::ops::Add::add)
             .ok_or(report!("Empty witness"))?
+            + ht_tau
             + (a * s)
             + (b_1 * r)
             - (self.delta_1 * (r * s));
-
         Ok(Proof { a, b: b_2, c })
     }
 }

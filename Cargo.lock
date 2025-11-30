@@ -273,6 +273,7 @@ dependencies = [
  "ark-ff",
  "ark-mnt6-753",
  "ark-std",
+ "itertools",
  "ndarray",
  "rand 0.9.2",
  "rootcause",
