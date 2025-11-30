@@ -1,10 +1,11 @@
 use ark_ec::CurveGroup;
 use ark_ff::Field;
+use ark_std::iterable::Iterable;
 use rootcause::{Report, report};
 use std::cmp::Ordering;
 use std::fmt::Debug;
 use std::iter::{Sum, zip};
-use std::ops::{Add, Mul, MulAssign, Sub};
+use std::ops::{Add, Div, Mul, MulAssign, Sub};
 
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct Polynomial<F>
@@ -48,6 +49,41 @@ impl<F: Field> Polynomial<F> {
     }
     pub fn degree(&self) -> usize {
         self.coefficients.len()
+    }
+
+    /// Find a polynomial by doing Lagrange interpolation over a vector
+    pub fn interpolate_from_vector(vec: &Vec<F>) -> Self {
+        vec.iter()
+            .enumerate()
+            .map(|(x, y)| {
+                let x = F::from(x as u128);
+                &(&(0..vec.len())
+                    .filter_map(|x_i| {
+                        if F::from(x_i as u128) == x {
+                            None
+                        } else {
+                            Some(Polynomial {
+                                coefficients: vec![-F::from(x_i as u128), F::from(1)],
+                            })
+                        }
+                    })
+                    .reduce(std::ops::Mul::mul)
+                    .unwrap_or(Polynomial {
+                        coefficients: Vec::new(),
+                    })
+                    / (0..vec.len())
+                        .filter_map(|x_i| {
+                            if F::from(x_i as u128) == x {
+                                None
+                            } else {
+                                Some(x - F::from(x_i as u128))
+                            }
+                        })
+                        .reduce(std::ops::Mul::mul)
+                        .unwrap_or(F::from(1)))
+                    * *y
+            })
+            .sum()
     }
 }
 
@@ -164,6 +200,15 @@ impl<F: Field> Mul<F> for &Polynomial<F> {
         }
     }
 }
+impl<F: Field> Div<F> for &Polynomial<F> {
+    type Output = Polynomial<F>;
+
+    fn div(self, rhs: F) -> Self::Output {
+        Polynomial {
+            coefficients: self.coefficients.iter().map(|x| *x / rhs).collect(),
+        }
+    }
+}
 
 impl<F: Field> Sum for Polynomial<F> {
     fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
@@ -176,6 +221,7 @@ impl<F: Field> Sum for Polynomial<F> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use rand::{Rng, RngCore, random};
 
     type Field = ark_mnt6_753::Fr;
 
@@ -224,5 +270,24 @@ mod tests {
             ],
         };
         assert_eq!(a * b, c);
+    }
+
+    #[test]
+    fn polynomial_interpolation() {
+        let mut rng = rand::rng();
+        let length: usize = rng.random_range(0..30);
+        let vec = (0..length)
+            .map(|_| {
+                let mut bytes = [0u8; 32];
+                rng.fill_bytes(&mut bytes);
+                ark_ff::Field::from_random_bytes(&bytes).unwrap()
+            })
+            .collect();
+        let poly = Polynomial::interpolate_from_vector(&vec);
+        let out: Vec<Field> = (0..vec.len())
+            .map(|x| poly.evaluate(Field::from(x as u128)))
+            .collect();
+
+        assert_eq!(vec, out)
     }
 }
