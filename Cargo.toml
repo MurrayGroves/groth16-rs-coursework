@@ -14,3 +14,4 @@ ndarray = "*"
 rand = "0.9"
 rootcause = "*"
 itertools = "*"
+clap = { version = "4.5.53", features = ["derive"] }

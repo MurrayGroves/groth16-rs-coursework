@@ -51,13 +51,23 @@ impl<F: Field> Polynomial<F> {
         self.coefficients.len()
     }
 
+    pub fn new(vec: Vec<F>) -> Self {
+        Polynomial { coefficients: vec }
+    }
+
+    pub fn from_ints(vec: Vec<u128>) -> Self {
+        Polynomial {
+            coefficients: vec.iter().map(|x| F::from(*x)).collect(),
+        }
+    }
+
     /// Find a polynomial by doing Lagrange interpolation over a vector
     pub fn interpolate_from_vector(vec: &Vec<F>) -> Self {
         vec.iter()
             .enumerate()
             .map(|(x, y)| {
-                let x = F::from(x as u128);
-                &(&(0..vec.len())
+                let x = F::from((x + 1) as u128);
+                &(&(1..vec.len() + 1)
                     .filter_map(|x_i| {
                         if F::from(x_i as u128) == x {
                             None
@@ -71,7 +81,7 @@ impl<F: Field> Polynomial<F> {
                     .unwrap_or(Polynomial {
                         coefficients: Vec::new(),
                     })
-                    / (0..vec.len())
+                    / (1..vec.len() + 1)
                         .filter_map(|x_i| {
                             if F::from(x_i as u128) == x {
                                 None
@@ -221,7 +231,7 @@ impl<F: Field> Sum for Polynomial<F> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use rand::{Rng, RngCore, random};
+    use rand::{Rng, RngCore};
 
     type Field = ark_mnt6_753::Fr;
 
@@ -276,7 +286,7 @@ mod tests {
     fn polynomial_interpolation() {
         let mut rng = rand::rng();
         let length: usize = rng.random_range(0..30);
-        let vec = (0..length)
+        let vec = (1..length + 1)
             .map(|_| {
                 let mut bytes = [0u8; 32];
                 rng.fill_bytes(&mut bytes);
@@ -284,7 +294,7 @@ mod tests {
             })
             .collect();
         let poly = Polynomial::interpolate_from_vector(&vec);
-        let out: Vec<Field> = (0..vec.len())
+        let out: Vec<Field> = (0 + 1..vec.len() + 1)
             .map(|x| poly.evaluate(Field::from(x as u128)))
             .collect();
 
