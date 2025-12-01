@@ -1,19 +1,64 @@
 use crate::polynomial::Polynomial;
-use ark_ff::{FftField, Field};
-use clap::Parser;
-use rootcause::hooks::report_creation::AttachmentCollectorHook;
+use ark_ff::FftField;
+use log::debug;
+use rand::Rng;
+use rootcause::{Report, report};
+use std::cmp::max;
+use std::iter::zip;
 
+#[derive(Clone, Debug)]
 pub struct R1CS<S: FftField> {
     /// Column-wise, i.e. a vec of columns
-    L: Vec<Vec<S>>,
+    pub L: Vec<Vec<S>>,
     /// Column-wise, i.e. a vec of columns
-    R: Vec<Vec<S>>,
+    pub R: Vec<Vec<S>>,
     /// Column-wise, i.e. a vec of columns
-    O: Vec<Vec<S>>,
+    pub O: Vec<Vec<S>>,
     pub public_witness: Vec<S>,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+impl<S: FftField> R1CS<S> {
+    pub fn new<T>(l: Vec<Vec<T>>, r: Vec<Vec<T>>, o: Vec<Vec<T>>, public_witness: Vec<T>) -> Self
+    where
+        S: From<T>,
+        T: Copy,
+    {
+        R1CS {
+            L: l.iter()
+                .map(|column| column.iter().map(|x| S::from(*x)).collect())
+                .collect(),
+            R: r.iter()
+                .map(|column| column.iter().map(|x| S::from(*x)).collect())
+                .collect(),
+            O: o.iter()
+                .map(|column| column.iter().map(|x| S::from(*x)).collect())
+                .collect(),
+            public_witness: public_witness.iter().map(|x| S::from(*x)).collect(),
+        }
+    }
+
+    pub fn verify(&self, witness: &Vec<S>) -> Result<bool, Report> {
+        let o = zip(&self.O, witness)
+            .map(|(o, w)| o.iter().map(|x| *x * *w).collect::<Vec<_>>())
+            .reduce(|a, b| zip(a, b).map(|(a_i, b_i)| a_i + b_i).collect())
+            .ok_or(report!("Empty vec"))?;
+        let l = zip(&self.L, witness)
+            .map(|(o, w)| o.iter().map(|x| *x * *w).collect::<Vec<_>>())
+            .reduce(|a, b| zip(a, b).map(|(a_i, b_i)| a_i + b_i).collect())
+            .ok_or(report!("Empty vec"))?;
+        let r = zip(&self.R, witness)
+            .map(|(o, w)| o.iter().map(|x| *x * *w).collect::<Vec<_>>())
+            .reduce(|a, b| zip(a, b).map(|(a_i, b_i)| a_i + b_i).collect())
+            .ok_or(report!("Empty vec"))?;
+
+        debug!("{:?} == {:?} * {:?}", o, l, r);
+        let rhs = zip(l, r).map(|(a_i, b_i)| a_i * b_i).collect::<Vec<_>>();
+
+        Ok(o == rhs)
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct QAP<S>
 where
     S: FftField,
@@ -28,8 +73,36 @@ where
 }
 
 impl<S: FftField> QAP<S> {
+    /// A QAP has degree `n` where `n` is the number of rows in the R1CS it was formed from
     pub fn degree(&self) -> usize {
-        self.w.len()
+        self.max_polynomial_degree() + 1
+    }
+
+    pub fn max_polynomial_degree(&self) -> usize {
+        vec![
+            self.u.iter().map(|x| x.degree()).max().unwrap_or(0),
+            self.v.iter().map(|x| x.degree()).max().unwrap_or(0),
+            self.w.iter().map(|x| x.degree()).max().unwrap_or(0),
+        ]
+        .iter()
+        .max()
+        .map(|x| *x)
+        .unwrap_or(0)
+    }
+
+    pub fn verify(&self, witness: &Vec<S>) -> Result<bool, Report> {
+        let mut rng = rand::rng();
+        let tau = S::from(rng.random_range(0..1000));
+
+        let a: Polynomial<S> = zip(&self.u, witness).map(|(u_i, a_i)| u_i * *a_i).sum();
+
+        let b: Polynomial<S> = zip(&self.v, witness).map(|(v_i, a_i)| v_i * *a_i).sum();
+
+        let w: Polynomial<S> = zip(&self.w, witness).map(|(w_i, a_i)| w_i * *a_i).sum();
+
+        let ht = &(&a * &b) - &w;
+
+        Ok(a.evaluate(&tau) * b.evaluate(&tau) == w.evaluate(&tau) + ht.evaluate(&tau))
     }
 }
 
@@ -61,6 +134,9 @@ mod tests {
     use crate::circuits::{QAP, R1CS};
     use crate::polynomial::Polynomial;
     use ark_ff::{Fp64, MontBackend};
+    use log::debug;
+    use rand::Rng;
+    use rootcause::Report;
 
     #[derive(ark_ff::MontConfig)]
     #[modulus = "641"]
@@ -129,32 +205,85 @@ mod tests {
 
         let known_good: QAP<Field> = QAP {
             u: vec![
-                Polynomial::from_ints(vec![636, 116, 636, 535]),
-                Polynomial::from_ints(vec![0, 0, 0, 0]),
-                Polynomial::from_ints(vec![8, 416, 5, 213]),
-                Polynomial::from_ints(vec![635, 330, 637, 321]),
-                Polynomial::from_ints(vec![4, 634, 324, 320]),
-                Polynomial::from_ints(vec![640, 536, 640, 107]),
+                Polynomial::from(vec![636, 116, 636, 535]),
+                Polynomial::from(vec![0, 0, 0, 0]),
+                Polynomial::from(vec![8, 416, 5, 213]),
+                Polynomial::from(vec![635, 330, 637, 321]),
+                Polynomial::from(vec![4, 634, 324, 320]),
+                Polynomial::from(vec![640, 536, 640, 107]),
             ],
             v: vec![
-                Polynomial::from_ints(vec![3, 529, 323, 427]),
-                Polynomial::from_ints(vec![0, 0, 0, 0]),
-                Polynomial::from_ints(vec![639, 112, 318, 214]),
-                Polynomial::from_ints(vec![0, 0, 0, 0]),
-                Polynomial::from_ints(vec![0, 0, 0, 0]),
-                Polynomial::from_ints(vec![0, 0, 0, 0]),
+                Polynomial::from(vec![3, 529, 323, 427]),
+                Polynomial::from(vec![0, 0, 0, 0]),
+                Polynomial::from(vec![639, 112, 318, 214]),
+                Polynomial::from(vec![0, 0, 0, 0]),
+                Polynomial::from(vec![0, 0, 0, 0]),
+                Polynomial::from(vec![0, 0, 0, 0]),
             ],
             w: vec![
-                Polynomial::from_ints(vec![0, 0, 0, 0]),
-                Polynomial::from_ints(vec![640, 536, 640, 107]),
-                Polynomial::from_ints(vec![0, 0, 0, 0]),
-                Polynomial::from_ints(vec![4, 423, 322, 534]),
-                Polynomial::from_ints(vec![635, 330, 637, 321]),
-                Polynomial::from_ints(vec![4, 634, 324, 320]),
+                Polynomial::from(vec![0, 0, 0, 0]),
+                Polynomial::from(vec![640, 536, 640, 107]),
+                Polynomial::from(vec![0, 0, 0, 0]),
+                Polynomial::from(vec![4, 423, 322, 534]),
+                Polynomial::from(vec![635, 330, 637, 321]),
+                Polynomial::from(vec![4, 634, 324, 320]),
             ],
             public_witness: Vec::new(),
         };
 
         assert_eq!(qap, known_good)
+    }
+
+    #[test]
+    fn r1cs_verification() -> Result<(), Report> {
+        let l = vec![
+            vec![0, 0, 0],
+            vec![0, 0, 0],
+            vec![1, 0, 0],
+            vec![0, 0, 0],
+            vec![0, 1, 0],
+            vec![0, 0, 0],
+            vec![0, 0, 1],
+            vec![0, 0, 0],
+        ];
+
+        let r = vec![
+            vec![0, 0, 0],
+            vec![0, 0, 0],
+            vec![0, 0, 0],
+            vec![1, 0, 0],
+            vec![0, 0, 0],
+            vec![0, 1, 0],
+            vec![0, 0, 0],
+            vec![0, 0, 1],
+        ];
+
+        let o = vec![
+            vec![0, 0, 0],
+            vec![0, 0, 1],
+            vec![0, 0, 0],
+            vec![0, 0, 0],
+            vec![0, 0, 0],
+            vec![0, 0, 0],
+            vec![1, 0, 0],
+            vec![0, 1, 0],
+        ];
+
+        debug!("Matrices initialised");
+        let r1cs: R1CS<Field> = R1CS::new(l, r, o, Vec::new());
+        let mut rng = rand::rng();
+        let x = Field::from(rng.random_range(0..1000));
+        let y = Field::from(rng.random_range(0..1000));
+        let z = Field::from(rng.random_range(0..1000));
+        let u = Field::from(rng.random_range(0..1000));
+        let r = x * y * z * u;
+        let v1 = x * y;
+        let v2 = z * u;
+        let w = vec![Field::from(1), r, x, y, z, u, v1, v2];
+
+        debug!("Generating proof for witness {:?}", w);
+        assert_eq!(r, x * y * z * u);
+        assert!(r1cs.verify(&w)?);
+        Ok(())
     }
 }

@@ -12,6 +12,8 @@ ark-ff = "*"
 ndarray = "*"
 
 rand = "0.9"
-rootcause = "*"
+rootcause = { version = "0.10", features = ["backtrace"] }
 itertools = "*"
 clap = { version = "4.5.53", features = ["derive"] }
+log = "0.4.28"
+env_logger = "0.11.8"
