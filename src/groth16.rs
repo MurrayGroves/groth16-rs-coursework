@@ -23,19 +23,28 @@ impl<C: Pairing> Proof<C> {
         trusted_setup: TrustedSetupOutput<C>,
         public_witness: &Vec<C::ScalarField>,
     ) -> bool {
+        debug!("Verifying with public witness: {:?}", public_witness);
         let lhs = C::pairing(self.a, self.b);
         let alpha_beta = C::pairing(trusted_setup.alpha, trusted_setup.beta_2);
         let x1 = public_witness
             .iter()
             .enumerate()
             .map(|(i, a_i)| trusted_setup.psi_polynomials[i] * a_i)
-            .reduce(|a, b| a + b)
-            .unwrap_or(C::G1::generator());
-        let x1_gamma = C::pairing(x1, trusted_setup.gamma);
+            .reduce(|a, b| a + b);
+        let x1_gamma = if let Some(x1) = x1 {
+            Some(C::pairing(x1, trusted_setup.gamma))
+        } else {
+            None
+        };
         let c_delta = C::pairing(self.c, trusted_setup.delta_2);
 
-        debug!("{} == {} + {} + {}", lhs, alpha_beta, x1_gamma, c_delta);
-        lhs == alpha_beta + x1_gamma + c_delta
+        debug!("{} == {} + {:?} + {}", lhs, alpha_beta, x1_gamma, c_delta);
+        let rhs = if let Some(x1_gamma) = x1_gamma {
+            alpha_beta + x1_gamma + c_delta
+        } else {
+            alpha_beta + c_delta
+        };
+        lhs.0 == rhs.0
     }
 }
 
@@ -107,6 +116,31 @@ impl<C: Pairing> TrustedSetupOutput<C> {
             .collect::<Result<_, _>>()?)
     }
 
+    fn psi_polynomials(
+        qap: &QAP<C::ScalarField>,
+        group_1_srs: &Vec<C::G1>,
+        alpha: C::ScalarField,
+        beta: C::ScalarField,
+        gamma: C::ScalarField,
+        delta: C::ScalarField,
+    ) -> Result<Vec<C::G1>, Report> {
+        izip!(&qap.u, &qap.v, &qap.w)
+            .enumerate()
+            .map(|(i, (u_i, v_i, w_i))| {
+                let divisor = if i < qap.public_witness.len() {
+                    gamma
+                } else {
+                    delta
+                };
+
+                Ok(
+                    (&((v_i * alpha) + (u_i * beta)) + w_i).evaluate_over_srs(&group_1_srs)?
+                        * (C::ScalarField::from(1) / divisor),
+                )
+            })
+            .collect::<Result<Vec<_>, Report>>()
+    }
+
     pub fn new(qap: QAP<C::ScalarField>) -> Result<TrustedSetupOutput<C>, Report> {
         debug!("Starting trusted setup");
         let mut rng = rand::rngs::StdRng::from_os_rng();
@@ -131,27 +165,12 @@ impl<C: Pairing> TrustedSetupOutput<C> {
         debug!("Generated Group 2 SRS");
 
         let zero_polynomial_srs =
-            Self::zero_polynomial_srs(qap.degree(), (qap.degree()) - 2, delta, &group_1_srs)
+            Self::zero_polynomial_srs(qap.degree(), qap.degree() - 1, delta, &group_1_srs)
                 .context("Calculating zero polynomial SRS")?;
 
         debug!("Generated zero polynomial srs");
 
-        let psi_polynomials = izip!(&qap.u, &qap.v, &qap.w)
-            .enumerate()
-            .map(|(i, (u_i, v_i, w_i))| {
-                let divisor = if i < qap.public_witness.len() {
-                    gamma
-                } else {
-                    delta
-                };
-
-                C::G1::generator()
-                    * (((v_i.evaluate(&tau) * alpha)
-                        + (u_i.evaluate(&tau) * beta)
-                        + w_i.evaluate(&tau))
-                        / divisor)
-            })
-            .collect();
+        let psi_polynomials = Self::psi_polynomials(&qap, &group_1_srs, alpha, beta, gamma, delta)?;
 
         debug!("Generated psi polynomials");
 
@@ -220,6 +239,25 @@ impl<C: Pairing> TrustedSetupOutput<C> {
             .reduce(std::ops::Add::add)
             .ok_or(report!("Empty witness"))?)
     }
+
+    fn evaluate_v_1(&self, witness: &Vec<C::ScalarField>) -> Result<C::G1, Report> {
+        if witness.len() != self.qap.v.len() {
+            bail!("Witness wrong size for QAP")
+        }
+        let evaluated_v = self
+            .qap
+            .v
+            .iter()
+            .map(|x| x.evaluate_over_srs(&self.group_1_srs))
+            .collect::<Result<Vec<_>, Report>>()?;
+
+        Ok(zip(evaluated_v, witness)
+            .map(|(p, a_i)| p * a_i)
+            .collect::<Vec<_>>()
+            .into_iter()
+            .reduce(std::ops::Add::add)
+            .ok_or(report!("Empty witness"))?)
+    }
     fn evaluate_w(&self, witness: &Vec<C::ScalarField>) -> Result<C::G1, Report> {
         if witness.len() != self.qap.w.len() {
             bail!("Witness wrong size for QAP")
@@ -249,21 +287,7 @@ impl<C: Pairing> TrustedSetupOutput<C> {
 
         let b_2 = self.beta_2 + self.evaluate_v(witness)? + (self.delta_2 * s);
 
-        let evaluated_v_1 = self
-            .qap
-            .v
-            .iter()
-            .map(|x| x.evaluate_over_srs(&self.group_1_srs))
-            .collect::<Result<Vec<_>, Report>>()?;
-
-        let b_sum = zip(evaluated_v_1, witness)
-            .map(|(p, a_i)| p * a_i)
-            .collect::<Vec<_>>()
-            .into_iter()
-            .reduce(std::ops::Add::add)
-            .ok_or(report!("Empty witness"))?;
-
-        let b_1 = self.beta_1 + b_sum + (self.delta_1 * s);
+        let b_1 = self.beta_1 + self.evaluate_v_1(witness)? + (self.delta_1 * s);
 
         let ht = self.calculate_zero_polynomial(witness)?;
         let ht_tau = ht.evaluate_over_srs(&self.zero_polynomial_srs)?;
@@ -293,8 +317,9 @@ mod tests {
     use ark_mnt6_753::MNT6_753;
     use log::debug;
     use rand::Rng;
-    use rootcause::Report;
     use rootcause::prelude::ResultExt;
+    use rootcause::{Report, report};
+    use std::iter::zip;
 
     fn init() {
         let _ = env_logger::builder().is_test(true).try_init();
@@ -459,7 +484,7 @@ mod tests {
     }
 
     #[test]
-    fn evaluations_consistent() -> Result<(), Report> {
+    fn naive() -> Result<(), Report> {
         init();
         let l = vec![
             vec![0, 0, 0],
@@ -522,7 +547,6 @@ mod tests {
             qap.max_polynomial_degree()
         );
 
-        let ht = trusted_setup.calculate_zero_polynomial(&w)?;
         let zero_polynomial_srs: Vec<<MNT6_753 as Pairing>::G1> =
             TrustedSetupOutput::<MNT6_753>::zero_polynomial_srs(
                 qap.degree(),
@@ -531,9 +555,10 @@ mod tests {
                 &trusted_setup.group_1_srs,
             )?;
 
-        debug!("zero polynomial: {:?}", ht);
         assert_eq!(zero_polynomial_srs.len(), qap.degree() - 1);
 
+        let ht = trusted_setup.calculate_zero_polynomial(&w)?;
+        debug!("zero polynomial: {:?}", ht);
         let ht_tau = ht
             .evaluate_over_srs(&zero_polynomial_srs)
             .context("Evaluating ht_tau")?;
@@ -546,6 +571,239 @@ mod tests {
         let rhs = MNT6_753::pairing(c, <MNT6_753 as Pairing>::G2::generator()).0;
 
         debug!("{:?} == {:?}", lhs, rhs);
+
+        assert_eq!(lhs, rhs);
+
+        Ok(())
+    }
+    #[test]
+    fn naive_plus_alpha_beta() -> Result<(), Report> {
+        init();
+        let l = vec![
+            vec![0, 0, 0],
+            vec![0, 0, 0],
+            vec![1, 0, 0],
+            vec![0, 0, 0],
+            vec![0, 1, 0],
+            vec![0, 0, 0],
+            vec![0, 0, 1],
+            vec![0, 0, 0],
+        ];
+
+        let r = vec![
+            vec![0, 0, 0],
+            vec![0, 0, 0],
+            vec![0, 0, 0],
+            vec![1, 0, 0],
+            vec![0, 0, 0],
+            vec![0, 1, 0],
+            vec![0, 0, 0],
+            vec![0, 0, 1],
+        ];
+
+        let o = vec![
+            vec![0, 0, 0],
+            vec![0, 0, 1],
+            vec![0, 0, 0],
+            vec![0, 0, 0],
+            vec![0, 0, 0],
+            vec![0, 0, 0],
+            vec![1, 0, 0],
+            vec![0, 1, 0],
+        ];
+
+        debug!("Matrices initialised");
+        let r1cs: R1CS<Field> = R1CS::new(l, r, o, Vec::new());
+
+        debug!("R1CS initialised: {:?}", r1cs);
+        let qap = QAP::from(r1cs.clone());
+        assert_eq!(qap.degree(), 3);
+
+        debug!("QAP derived");
+        let trusted_setup: TrustedSetupOutput<ark_mnt6_753::MNT6_753> =
+            TrustedSetupOutput::new(qap.clone())?;
+
+        debug!("Trusted Setup complete");
+
+        let mut rng = rand::rng();
+        let x = Field::from(rng.random_range(0..1000));
+        let y = Field::from(rng.random_range(0..1000));
+        let z = Field::from(rng.random_range(0..1000));
+        let u = Field::from(rng.random_range(0..1000));
+        let r = x * y * z * u;
+        let v1 = x * y;
+        let v2 = z * u;
+        let w = vec![Field::from(1), r, x, y, z, u, v1, v2];
+
+        debug!(
+            "QAP Max Polynomial Degree: {:?}",
+            qap.max_polynomial_degree()
+        );
+
+        let zero_polynomial_srs: Vec<<MNT6_753 as Pairing>::G1> =
+            TrustedSetupOutput::<MNT6_753>::zero_polynomial_srs(
+                qap.degree(),
+                (qap.degree()) - 1,
+                <MNT6_753 as Pairing>::ScalarField::from(1),
+                &trusted_setup.group_1_srs,
+            )?;
+
+        assert_eq!(zero_polynomial_srs.len(), qap.degree() - 1);
+
+        let ht = trusted_setup.calculate_zero_polynomial(&w)?;
+        debug!("zero polynomial: {:?}", ht);
+        let ht_tau = ht
+            .evaluate_over_srs(&zero_polynomial_srs)
+            .context("Evaluating ht_tau")?;
+
+        let alpha = rand_scalar(&mut rng);
+        let beta = rand_scalar(&mut rng);
+        let alpha_1 = <MNT6_753 as Pairing>::G1::generator() * alpha;
+        let beta_2 = <MNT6_753 as Pairing>::G2::generator() * beta;
+        let psi_polynomials = TrustedSetupOutput::<MNT6_753>::psi_polynomials(
+            &qap,
+            &trusted_setup.group_1_srs,
+            alpha,
+            beta,
+            <MNT6_753 as Pairing>::ScalarField::from(1),
+            <MNT6_753 as Pairing>::ScalarField::from(1),
+        )?;
+
+        assert_eq!(psi_polynomials.len(), w.len());
+
+        let a = alpha_1 + trusted_setup.evaluate_u(&w).context("Evaluating u")?;
+        let b = beta_2 + trusted_setup.evaluate_v(&w).context("Evaluating v")?;
+        let c = zip(&psi_polynomials, &w)
+            .skip(qap.public_witness.len())
+            .map(|(psi, a_i)| *psi * a_i)
+            .reduce(std::ops::Add::add)
+            .ok_or(report!("Empty witness"))?
+            + ht_tau;
+
+        let lhs = MNT6_753::pairing(a, b).0;
+        let rhs = (MNT6_753::pairing(alpha_1, beta_2)
+            + MNT6_753::pairing(c, <MNT6_753 as Pairing>::G2::generator()))
+        .0;
+
+        assert_eq!(lhs, rhs);
+
+        Ok(())
+    }
+    #[test]
+    fn naive_plus_gamma_delta() -> Result<(), Report> {
+        init();
+        let l = vec![
+            vec![0, 0, 0],
+            vec![0, 0, 0],
+            vec![1, 0, 0],
+            vec![0, 0, 0],
+            vec![0, 1, 0],
+            vec![0, 0, 0],
+            vec![0, 0, 1],
+            vec![0, 0, 0],
+        ];
+
+        let r = vec![
+            vec![0, 0, 0],
+            vec![0, 0, 0],
+            vec![0, 0, 0],
+            vec![1, 0, 0],
+            vec![0, 0, 0],
+            vec![0, 1, 0],
+            vec![0, 0, 0],
+            vec![0, 0, 1],
+        ];
+
+        let o = vec![
+            vec![0, 0, 0],
+            vec![0, 0, 1],
+            vec![0, 0, 0],
+            vec![0, 0, 0],
+            vec![0, 0, 0],
+            vec![0, 0, 0],
+            vec![1, 0, 0],
+            vec![0, 1, 0],
+        ];
+
+        debug!("Matrices initialised");
+        let r1cs: R1CS<Field> = R1CS::new(l, r, o, Vec::new());
+
+        debug!("R1CS initialised: {:?}", r1cs);
+        let qap = QAP::from(r1cs.clone());
+        assert_eq!(qap.degree(), 3);
+
+        debug!("QAP derived");
+        let trusted_setup: TrustedSetupOutput<ark_mnt6_753::MNT6_753> =
+            TrustedSetupOutput::new(qap.clone())?;
+
+        debug!("Trusted Setup complete");
+
+        let mut rng = rand::rng();
+        let x = Field::from(rng.random_range(0..1000));
+        let y = Field::from(rng.random_range(0..1000));
+        let z = Field::from(rng.random_range(0..1000));
+        let u = Field::from(rng.random_range(0..1000));
+        let r = x * y * z * u;
+        let v1 = x * y;
+        let v2 = z * u;
+        let w = vec![Field::from(1), r, x, y, z, u, v1, v2];
+
+        debug!(
+            "QAP Max Polynomial Degree: {:?}",
+            qap.max_polynomial_degree()
+        );
+
+        let delta = rand_scalar(&mut rng);
+        let zero_polynomial_srs: Vec<<MNT6_753 as Pairing>::G1> =
+            TrustedSetupOutput::<MNT6_753>::zero_polynomial_srs(
+                qap.degree(),
+                (qap.degree()) - 1,
+                delta,
+                &trusted_setup.group_1_srs,
+            )?;
+
+        assert_eq!(zero_polynomial_srs.len(), qap.degree() - 1);
+
+        let ht = trusted_setup.calculate_zero_polynomial(&w)?;
+        debug!("zero polynomial: {:?}", ht);
+        let ht_tau = ht
+            .evaluate_over_srs(&zero_polynomial_srs)
+            .context("Evaluating ht_tau")?;
+
+        let alpha = rand_scalar(&mut rng);
+        let beta = rand_scalar(&mut rng);
+        let alpha_1 = <MNT6_753 as Pairing>::G1::generator() * alpha;
+        let beta_2 = <MNT6_753 as Pairing>::G2::generator() * beta;
+        let psi_polynomials = TrustedSetupOutput::<MNT6_753>::psi_polynomials(
+            &qap,
+            &trusted_setup.group_1_srs,
+            alpha,
+            beta,
+            <MNT6_753 as Pairing>::ScalarField::from(1),
+            delta,
+        )?;
+
+        assert_eq!(psi_polynomials.len(), w.len());
+
+        let a = alpha_1 + trusted_setup.evaluate_u(&w).context("Evaluating u")?;
+        let b = beta_2 + trusted_setup.evaluate_v(&w).context("Evaluating v")?;
+        let c = zip(&psi_polynomials, &w)
+            .skip(qap.public_witness.len())
+            .map(|(psi, a_i)| *psi * a_i)
+            .reduce(std::ops::Add::add)
+            .ok_or(report!("Empty witness"))?
+            + ht_tau;
+
+        let delta_2 = <MNT6_753 as Pairing>::G2::generator() * delta;
+        let lhs = MNT6_753::pairing(a, b).0;
+        let rhs = (MNT6_753::pairing(alpha_1, beta_2)
+            // + MNT6_753::pairing(
+            //     <MNT6_753 as Pairing>::G1::generator(),
+            //     <MNT6_753 as Pairing>::G2::generator()
+            //         * <MNT6_753 as Pairing>::ScalarField::from(1),
+            // )
+            + MNT6_753::pairing(c, delta_2))
+        .0;
 
         assert_eq!(lhs, rhs);
 

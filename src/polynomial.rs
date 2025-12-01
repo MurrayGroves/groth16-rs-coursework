@@ -1,7 +1,7 @@
 use ark_ec::CurveGroup;
 use ark_ff::Field;
 use ark_std::iterable::Iterable;
-use log::debug;
+use log::{debug, trace};
 use rootcause::prelude::ResultExt;
 use rootcause::{Report, bail, report};
 use std::cmp::Ordering;
@@ -291,11 +291,11 @@ impl<F: Field> Div for Polynomial<F> {
             }
 
             let out = Polynomial::from(coefficients);
-            debug!("{:?}/{:?} == {:?}", self, rhs, out);
+            trace!("{:?}/{:?} == {:?}", self, rhs, out);
             return Ok(out);
         }
 
-        debug!("Dividing {:?}/{:?}", self, rhs);
+        trace!("Dividing {:?}/{:?}", self, rhs);
         let mut quotient = Polynomial::new(vec![]);
         let mut remainder = self.clone();
 
@@ -306,7 +306,7 @@ impl<F: Field> Div for Polynomial<F> {
                 .attach(format!("RHS: {:?}", rhs.lead()))?;
             quotient += tmp.clone();
             remainder -= &tmp * &rhs;
-            debug!(
+            trace!(
                 "Quotient: {:?}\nRemainder: {:?}\nTmp: {:?}",
                 quotient, remainder, tmp
             );
