@@ -1,0 +1,174 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Trait for customizing how contexts of a specific type are formatted in error reports."><title>ContextFormattingOverride in rootcause::hooks::formatting_overrides::context - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-e56847b5.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="rootcause" data-themes="" data-resource-suffix="" data-rustdoc-version="1.91.1 (ed61e7d7e 2025-11-07)" data-channel="1.91.1" data-search-js="search-e256b49e.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../../../static.files/storage-e2aeef58.js"></script><script defer src="sidebar-items.js"></script><script defer src="../../../../static.files/main-6dc2a7f3.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc trait"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">ContextFormattingOverride</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../../rootcause/index.html">rootcause</a><span class="version">0.10.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Context<wbr>Formatting<wbr>Override</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#type-parameters" title="Type Parameters">Type Parameters</a></li><li><a href="#default-implementations" title="Default Implementations">Default Implementations</a></li><li><a href="#examples" title="Examples">Examples</a></li></ul><h3><a href="#provided-methods">Provided Methods</a></h3><ul class="block"><li><a href="#method.debug" title="debug">debug</a></li><li><a href="#method.debug_preformatted" title="debug_preformatted">debug_preformatted</a></li><li><a href="#method.display" title="display">display</a></li><li><a href="#method.display_preformatted" title="display_preformatted">display_preformatted</a></li><li><a href="#method.preferred_context_formatting_style" title="preferred_context_formatting_style">preferred_context_formatting_style</a></li></ul><h3><a href="#implementors">Implementors</a></h3></section><div id="rustdoc-modnav"><h2><a href="index.html">In rootcause::<wbr>hooks::<wbr>formatting_<wbr>overrides::<wbr>context</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../../../index.html">rootcause</a>::<wbr><a href="../../index.html">hooks</a>::<wbr><a href="../index.html">formatting_overrides</a>::<wbr><a href="index.html">context</a></div><h1>Trait <span class="trait">Context<wbr>Formatting<wbr>Override</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../../../src/rootcause/hooks/formatting_overrides/context.rs.html#227-356">Source</a> </span></div><pre class="rust item-decl"><code>pub trait ContextFormattingOverride&lt;C&gt;:
+    'static
+    + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a>
+    + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a> {
+    // Provided methods
+    fn <a href="#method.display" class="fn">display</a>(
+        &amp;self,
+        report: <a class="struct" href="../../../struct.ReportRef.html" title="struct rootcause::ReportRef">ReportRef</a>&lt;'_, C, <a class="struct" href="../../../markers/struct.Uncloneable.html" title="struct rootcause::markers::Uncloneable">Uncloneable</a>, <a class="struct" href="../../../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;,
+        formatter: &amp;mut <a class="struct" href="https://doc.rust-lang.org/1.91.1/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>&lt;'_&gt;,
+    ) -&gt; <a class="type" href="https://doc.rust-lang.org/1.91.1/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a> { ... }
+<span class="item-spacer"></span>    fn <a href="#method.display_preformatted" class="fn">display_preformatted</a>(
+        &amp;self,
+        report: <a class="struct" href="../../../struct.ReportRef.html" title="struct rootcause::ReportRef">ReportRef</a>&lt;'_, <a class="struct" href="../../../preformatted/struct.PreformattedContext.html" title="struct rootcause::preformatted::PreformattedContext">PreformattedContext</a>, <a class="struct" href="../../../markers/struct.Uncloneable.html" title="struct rootcause::markers::Uncloneable">Uncloneable</a>, <a class="struct" href="../../../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;,
+        formatter: &amp;mut <a class="struct" href="https://doc.rust-lang.org/1.91.1/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>&lt;'_&gt;,
+    ) -&gt; <a class="type" href="https://doc.rust-lang.org/1.91.1/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a> { ... }
+<span class="item-spacer"></span>    fn <a href="#method.debug" class="fn">debug</a>(
+        &amp;self,
+        report: <a class="struct" href="../../../struct.ReportRef.html" title="struct rootcause::ReportRef">ReportRef</a>&lt;'_, C, <a class="struct" href="../../../markers/struct.Uncloneable.html" title="struct rootcause::markers::Uncloneable">Uncloneable</a>, <a class="struct" href="../../../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;,
+        formatter: &amp;mut <a class="struct" href="https://doc.rust-lang.org/1.91.1/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>&lt;'_&gt;,
+    ) -&gt; <a class="type" href="https://doc.rust-lang.org/1.91.1/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a> { ... }
+<span class="item-spacer"></span>    fn <a href="#method.debug_preformatted" class="fn">debug_preformatted</a>(
+        &amp;self,
+        report: <a class="struct" href="../../../struct.ReportRef.html" title="struct rootcause::ReportRef">ReportRef</a>&lt;'_, <a class="struct" href="../../../preformatted/struct.PreformattedContext.html" title="struct rootcause::preformatted::PreformattedContext">PreformattedContext</a>, <a class="struct" href="../../../markers/struct.Uncloneable.html" title="struct rootcause::markers::Uncloneable">Uncloneable</a>, <a class="struct" href="../../../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;,
+        formatter: &amp;mut <a class="struct" href="https://doc.rust-lang.org/1.91.1/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>&lt;'_&gt;,
+    ) -&gt; <a class="type" href="https://doc.rust-lang.org/1.91.1/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a> { ... }
+<span class="item-spacer"></span>    fn <a href="#method.preferred_context_formatting_style" class="fn">preferred_context_formatting_style</a>(
+        &amp;self,
+        report: <a class="struct" href="../../../struct.ReportRef.html" title="struct rootcause::ReportRef">ReportRef</a>&lt;'_, dyn <a class="trait" href="../../../prelude/trait.Any.html" title="trait rootcause::prelude::Any">Any</a>, <a class="struct" href="../../../markers/struct.Uncloneable.html" title="struct rootcause::markers::Uncloneable">Uncloneable</a>, <a class="struct" href="../../../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;,
+        report_formatting_function: <a class="enum" href="../../../handlers/enum.FormattingFunction.html" title="enum rootcause::handlers::FormattingFunction">FormattingFunction</a>,
+    ) -&gt; <a class="struct" href="../../../handlers/struct.ContextFormattingStyle.html" title="struct rootcause::handlers::ContextFormattingStyle">ContextFormattingStyle</a> { ... }
+}</code></pre><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Trait for customizing how contexts of a specific type are formatted in error
+reports.</p>
+<p>This trait allows you to override the default formatting behavior for
+contexts (the main error types) of type <code>C</code>. You can customize both Display
+and Debug formatting, handle preformatted contexts, and specify preferred
+formatting styles.</p>
+<h2 id="type-parameters"><a class="doc-anchor" href="#type-parameters">§</a>Type Parameters</h2>
+<ul>
+<li><code>C</code> - The context type that this formatter handles</li>
+</ul>
+<h2 id="default-implementations"><a class="doc-anchor" href="#default-implementations">§</a>Default Implementations</h2>
+<p>All methods have default implementations that delegate to the unhooked
+formatting, so you only need to override the methods for the formatting you
+want to customize.</p>
+<h2 id="examples"><a class="doc-anchor" href="#examples">§</a>Examples</h2>
+<p>Custom Display formatting for a business logic error:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>core::fmt;
+
+<span class="kw">use </span>rootcause::{
+    ReportRef,
+    hooks::formatting_overrides::context::ContextFormattingOverride,
+    markers::{Local, Uncloneable},
+};
+
+<span class="kw">struct </span>ValidationError {
+    field: String,
+    rule: String,
+    value: String,
+}
+
+<span class="kw">struct </span>ValidationErrorFormatter;
+
+<span class="kw">impl </span>ContextFormattingOverride&lt;ValidationError&gt; <span class="kw">for </span>ValidationErrorFormatter {
+    <span class="kw">fn </span>display(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        report: ReportRef&lt;<span class="lifetime">'_</span>, ValidationError, Uncloneable, Local&gt;,
+        f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;,
+    ) -&gt; fmt::Result {
+        <span class="kw">let </span>err = report.current_context();
+        <span class="macro">write!</span>(
+            f,
+            <span class="string">"Validation failed for field '{}': value '{}' violates rule '{}'"</span>,
+            err.field, err.value, err.rule
+        )
+    }
+}</code></pre></div></div></details><h2 id="provided-methods" class="section-header">Provided Methods<a href="#provided-methods" class="anchor">§</a></h2><div class="methods"><details class="toggle method-toggle" open><summary><section id="method.display" class="method"><a class="src rightside" href="../../../../src/rootcause/hooks/formatting_overrides/context.rs.html#268-274">Source</a><h4 class="code-header">fn <a href="#method.display" class="fn">display</a>(
+    &amp;self,
+    report: <a class="struct" href="../../../struct.ReportRef.html" title="struct rootcause::ReportRef">ReportRef</a>&lt;'_, C, <a class="struct" href="../../../markers/struct.Uncloneable.html" title="struct rootcause::markers::Uncloneable">Uncloneable</a>, <a class="struct" href="../../../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;,
+    formatter: &amp;mut <a class="struct" href="https://doc.rust-lang.org/1.91.1/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>&lt;'_&gt;,
+) -&gt; <a class="type" href="https://doc.rust-lang.org/1.91.1/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></h4></section></summary><div class="docblock"><p>Formats the context using Display formatting.</p>
+<p>This method is called when the context needs to be displayed in a
+user-friendly format. The default implementation delegates to the
+context’s unhooked Display formatting.</p>
+<h5 id="arguments"><a class="doc-anchor" href="#arguments">§</a>Arguments</h5>
+<ul>
+<li><code>report</code> - Reference to the report containing the context to format</li>
+<li><code>formatter</code> - The formatter to write output to</li>
+</ul>
+<h5 id="examples-1"><a class="doc-anchor" href="#examples-1">§</a>Examples</h5>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>core::fmt;
+
+<span class="kw">use </span>rootcause::{
+    ReportRef,
+    hooks::formatting_overrides::context::ContextFormattingOverride,
+    markers::{Local, Uncloneable},
+};
+
+<span class="kw">struct </span>HttpError {
+    status: u16,
+    message: String,
+}
+
+<span class="kw">struct </span>HttpErrorFormatter;
+
+<span class="kw">impl </span>ContextFormattingOverride&lt;HttpError&gt; <span class="kw">for </span>HttpErrorFormatter {
+    <span class="kw">fn </span>display(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        report: ReportRef&lt;<span class="lifetime">'_</span>, HttpError, Uncloneable, Local&gt;,
+        f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;,
+    ) -&gt; fmt::Result {
+        <span class="kw">let </span>err = report.current_context();
+        <span class="macro">write!</span>(f, <span class="string">"HTTP {} - {}"</span>, err.status, err.message)
+    }
+}</code></pre></div></div></details><details class="toggle method-toggle" open><summary><section id="method.display_preformatted" class="method"><a class="src rightside" href="../../../../src/rootcause/hooks/formatting_overrides/context.rs.html#287-293">Source</a><h4 class="code-header">fn <a href="#method.display_preformatted" class="fn">display_preformatted</a>(
+    &amp;self,
+    report: <a class="struct" href="../../../struct.ReportRef.html" title="struct rootcause::ReportRef">ReportRef</a>&lt;'_, <a class="struct" href="../../../preformatted/struct.PreformattedContext.html" title="struct rootcause::preformatted::PreformattedContext">PreformattedContext</a>, <a class="struct" href="../../../markers/struct.Uncloneable.html" title="struct rootcause::markers::Uncloneable">Uncloneable</a>, <a class="struct" href="../../../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;,
+    formatter: &amp;mut <a class="struct" href="https://doc.rust-lang.org/1.91.1/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>&lt;'_&gt;,
+) -&gt; <a class="type" href="https://doc.rust-lang.org/1.91.1/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></h4></section></summary><div class="docblock"><p>Formats a preformatted context using Display formatting.</p>
+<p>This method handles contexts that have been preformatted (typically done
+using <a href="../../../struct.ReportRef.html#method.preformat" title="method rootcause::ReportRef::preformat"><code>ReportRef::preformat</code></a> for performance or consistency reasons).
+The default implementation delegates to the context’s unhooked
+Display formatting.</p>
+<h5 id="arguments-1"><a class="doc-anchor" href="#arguments-1">§</a>Arguments</h5>
+<ul>
+<li><code>report</code> - Reference to the report containing the preformatted context</li>
+<li><code>formatter</code> - The formatter to write output to</li>
+</ul>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.debug" class="method"><a class="src rightside" href="../../../../src/rootcause/hooks/formatting_overrides/context.rs.html#305-311">Source</a><h4 class="code-header">fn <a href="#method.debug" class="fn">debug</a>(
+    &amp;self,
+    report: <a class="struct" href="../../../struct.ReportRef.html" title="struct rootcause::ReportRef">ReportRef</a>&lt;'_, C, <a class="struct" href="../../../markers/struct.Uncloneable.html" title="struct rootcause::markers::Uncloneable">Uncloneable</a>, <a class="struct" href="../../../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;,
+    formatter: &amp;mut <a class="struct" href="https://doc.rust-lang.org/1.91.1/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>&lt;'_&gt;,
+) -&gt; <a class="type" href="https://doc.rust-lang.org/1.91.1/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></h4></section></summary><div class="docblock"><p>Formats the context using Debug formatting.</p>
+<p>This method is called when the context needs to be displayed in a
+debug-friendly format (typically more verbose and detailed). The default
+implementation delegates to the context’s unhooked Debug formatting.</p>
+<h5 id="arguments-2"><a class="doc-anchor" href="#arguments-2">§</a>Arguments</h5>
+<ul>
+<li><code>report</code> - Reference to the report containing the context to format</li>
+<li><code>formatter</code> - The formatter to write output to</li>
+</ul>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.debug_preformatted" class="method"><a class="src rightside" href="../../../../src/rootcause/hooks/formatting_overrides/context.rs.html#323-329">Source</a><h4 class="code-header">fn <a href="#method.debug_preformatted" class="fn">debug_preformatted</a>(
+    &amp;self,
+    report: <a class="struct" href="../../../struct.ReportRef.html" title="struct rootcause::ReportRef">ReportRef</a>&lt;'_, <a class="struct" href="../../../preformatted/struct.PreformattedContext.html" title="struct rootcause::preformatted::PreformattedContext">PreformattedContext</a>, <a class="struct" href="../../../markers/struct.Uncloneable.html" title="struct rootcause::markers::Uncloneable">Uncloneable</a>, <a class="struct" href="../../../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;,
+    formatter: &amp;mut <a class="struct" href="https://doc.rust-lang.org/1.91.1/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>&lt;'_&gt;,
+) -&gt; <a class="type" href="https://doc.rust-lang.org/1.91.1/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></h4></section></summary><div class="docblock"><p>Formats a preformatted context using Debug formatting.</p>
+<p>This method handles preformatted contexts when debug formatting is
+requested. The default implementation delegates to the context’s
+unhooked Debug formatting.</p>
+<h5 id="arguments-3"><a class="doc-anchor" href="#arguments-3">§</a>Arguments</h5>
+<ul>
+<li><code>report</code> - Reference to the report containing the preformatted context</li>
+<li><code>formatter</code> - The formatter to write output to</li>
+</ul>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.preferred_context_formatting_style" class="method"><a class="src rightside" href="../../../../src/rootcause/hooks/formatting_overrides/context.rs.html#349-355">Source</a><h4 class="code-header">fn <a href="#method.preferred_context_formatting_style" class="fn">preferred_context_formatting_style</a>(
+    &amp;self,
+    report: <a class="struct" href="../../../struct.ReportRef.html" title="struct rootcause::ReportRef">ReportRef</a>&lt;'_, dyn <a class="trait" href="../../../prelude/trait.Any.html" title="trait rootcause::prelude::Any">Any</a>, <a class="struct" href="../../../markers/struct.Uncloneable.html" title="struct rootcause::markers::Uncloneable">Uncloneable</a>, <a class="struct" href="../../../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;,
+    report_formatting_function: <a class="enum" href="../../../handlers/enum.FormattingFunction.html" title="enum rootcause::handlers::FormattingFunction">FormattingFunction</a>,
+) -&gt; <a class="struct" href="../../../handlers/struct.ContextFormattingStyle.html" title="struct rootcause::handlers::ContextFormattingStyle">ContextFormattingStyle</a></h4></section></summary><div class="docblock"><p>Determines the preferred formatting style for this context.</p>
+<p>This method allows the formatter to specify how the context should be
+presented, including which formatting function should be used. The
+default implementation delegates to the context’s unhooked
+preference.</p>
+<h5 id="arguments-4"><a class="doc-anchor" href="#arguments-4">§</a>Arguments</h5>
+<ul>
+<li><code>report</code> - Reference to the report (as <code>dyn Any</code> as it can be either a
+<code>C</code> or a <a href="../../../preformatted/struct.PreformattedContext.html" title="struct rootcause::preformatted::PreformattedContext"><code>PreformattedContext</code></a>)</li>
+<li><code>report_formatting_function</code> - Whether the overall report uses Display
+or Debug formatting</li>
+</ul>
+<h5 id="returns"><a class="doc-anchor" href="#returns">§</a>Returns</h5>
+<p>A <code>ContextFormattingStyle</code> that specifies the preferred formatting
+approach</p>
+</div></details></div><h2 id="implementors" class="section-header">Implementors<a href="#implementors" class="anchor">§</a></h2><div id="implementors-list"></div><script src="../../../../trait.impl/rootcause/hooks/formatting_overrides/context/trait.ContextFormattingOverride.js" async></script></section></div></main></body></html>

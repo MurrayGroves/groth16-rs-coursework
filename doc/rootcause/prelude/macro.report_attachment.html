@@ -1,0 +1,69 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Creates a report attachment with contextual data."><title>report_attachment in rootcause::prelude - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-e56847b5.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rootcause" data-themes="" data-resource-suffix="" data-rustdoc-version="1.91.1 (ed61e7d7e 2025-11-07)" data-channel="1.91.1" data-search-js="search-e256b49e.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../static.files/storage-e2aeef58.js"></script><script defer src="sidebar-items.js"></script><script defer src="../../static.files/main-6dc2a7f3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc macro"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">report_attachment</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../rootcause/index.html">rootcause</a><span class="version">0.10.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">report_<wbr>attachment</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#usage-modes" title="Usage Modes">Usage Modes</a></li><li><a href="#examples" title="Examples">Examples</a><ul><li><a href="#string-attachments" title="String Attachments">String Attachments</a></li><li><a href="#structured-data-attachments" title="Structured Data Attachments">Structured Data Attachments</a></li><li><a href="#local-non-send-attachments" title="Local (Non-Send) Attachments">Local (Non-Send) Attachments</a></li></ul></li></ul></section><div id="rustdoc-modnav"><h2><a href="index.html">In rootcause::<wbr>prelude</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../index.html">rootcause</a>::<wbr><a href="index.html">prelude</a></div><h1>Macro <span class="macro">report_<wbr>attachment</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../src/rootcause/macros.rs.html#232-253">Source</a> </span></div><pre class="rust item-decl"><code>macro_rules! report_attachment {
+    ($msg:literal $(,)?) =&gt; { ... };
+    ($context:expr $(,)?) =&gt; { ... };
+    ($fmt:expr, $($arg:tt)*) =&gt; { ... };
+}</code></pre><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Creates a report attachment with contextual data.</p>
+<p>This macro creates a <a href="../report_attachment/struct.ReportAttachment.html" title="struct rootcause::report_attachment::ReportAttachment"><code>ReportAttachment</code></a> that can be added to error reports
+to provide additional context. It accepts the same arguments as the
+<a href="../macro.report.html" title="macro rootcause::report"><code>report!</code></a> macro but produces an attachment instead of a full report.</p>
+<p>Attachments are useful for adding supplementary information to errors
+without changing the main error context. For example, you might attach
+configuration values, request parameters, or debugging information.</p>
+<h2 id="usage-modes"><a class="doc-anchor" href="#usage-modes">§</a>Usage Modes</h2>
+<p>Like <a href="../macro.report.html" title="macro rootcause::report"><code>report!</code></a>, this macro supports both format string mode and context
+object mode. See the <a href="../macro.report.html" title="macro rootcause::report"><code>report!</code></a> documentation for details on each mode.</p>
+<h2 id="examples"><a class="doc-anchor" href="#examples">§</a>Examples</h2><h3 id="string-attachments"><a class="doc-anchor" href="#string-attachments">§</a>String Attachments</h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::any::{Any, TypeId};
+
+<span class="kw">use </span>rootcause::{prelude::<span class="kw-2">*</span>, report_attachment, report_attachment::ReportAttachment};
+
+<span class="comment">// Static string
+</span><span class="kw">let </span>attachment: ReportAttachment&lt;<span class="kw">dyn </span>Any, markers::SendSync&gt; =
+    <span class="macro">report_attachment!</span>(<span class="string">"Additional context"</span>);
+<span class="macro">assert_eq!</span>(attachment.inner_type_id(), TypeId::of::&lt;<span class="kw-2">&amp;</span><span class="lifetime">'static </span>str&gt;());
+<span class="macro">assert_eq!</span>(
+    attachment.inner_handler_type_id(),
+    TypeId::of::&lt;handlers::Display&gt;()
+);
+
+<span class="comment">// Formatted string
+</span><span class="kw">let </span>attachment: ReportAttachment&lt;<span class="kw">dyn </span>Any, markers::SendSync&gt; =
+    <span class="macro">report_attachment!</span>(<span class="string">"Error occurred at line: {}"</span>, <span class="number">42</span>);
+<span class="macro">assert_eq!</span>(attachment.inner_type_id(), TypeId::of::&lt;String&gt;());
+<span class="macro">assert_eq!</span>(
+    attachment.inner_handler_type_id(),
+    TypeId::of::&lt;handlers::Display&gt;()
+);</code></pre></div><h3 id="structured-data-attachments"><a class="doc-anchor" href="#structured-data-attachments">§</a>Structured Data Attachments</h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::any::TypeId;
+
+<span class="kw">use </span>rootcause::{prelude::<span class="kw-2">*</span>, report_attachment, report_attachment::ReportAttachment};
+
+<span class="attr">#[derive(Debug)]
+</span><span class="kw">struct </span>ErrorData {
+    code: i32,
+    message: String,
+}
+
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>ErrorData {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">"Error {}: {}"</span>, <span class="self">self</span>.code, <span class="self">self</span>.message)
+    }
+}
+
+<span class="kw">impl </span>std::error::Error <span class="kw">for </span>ErrorData {}
+
+<span class="kw">let </span>error_data = ErrorData {
+    code: <span class="number">404</span>,
+    message: <span class="string">"Not found"</span>.to_string(),
+};
+<span class="kw">let </span>attachment: ReportAttachment&lt;ErrorData, markers::SendSync&gt; = <span class="macro">report_attachment!</span>(error_data);
+<span class="macro">assert_eq!</span>(
+    attachment.inner_handler_type_id(),
+    TypeId::of::&lt;handlers::Display&gt;()
+);</code></pre></div><h3 id="local-non-send-attachments"><a class="doc-anchor" href="#local-non-send-attachments">§</a>Local (Non-Send) Attachments</h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::rc::Rc;
+
+<span class="kw">use </span>rootcause::{prelude::<span class="kw-2">*</span>, report_attachment, report_attachment::ReportAttachment};
+
+<span class="kw">let </span>local_data: Rc&lt;String&gt; = Rc::new(<span class="string">"Local context"</span>.to_string());
+<span class="kw">let </span>attachment: ReportAttachment&lt;Rc&lt;String&gt;, markers::Local&gt; = <span class="macro">report_attachment!</span>(local_data);</code></pre></div></div></details></section></div></main></body></html>

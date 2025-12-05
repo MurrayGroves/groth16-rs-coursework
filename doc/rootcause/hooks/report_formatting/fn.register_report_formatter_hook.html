@@ -1,0 +1,84 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Registers a global report formatter hook."><title>register_report_formatter_hook in rootcause::hooks::report_formatting - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e56847b5.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rootcause" data-themes="" data-resource-suffix="" data-rustdoc-version="1.91.1 (ed61e7d7e 2025-11-07)" data-channel="1.91.1" data-search-js="search-e256b49e.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../../static.files/storage-e2aeef58.js"></script><script defer src="sidebar-items.js"></script><script defer src="../../../static.files/main-6dc2a7f3.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc fn"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">register_report_formatter_hook</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../rootcause/index.html">rootcause</a><span class="version">0.10.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">register_<wbr>report_<wbr>formatter_<wbr>hook</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#examples" title="Examples">Examples</a><ul><li><a href="#registering-a-custom-formatter" title="Registering a Custom Formatter">Registering a Custom Formatter</a></li><li><a href="#replacing-an-existing-formatter" title="Replacing an Existing Formatter">Replacing an Existing Formatter</a></li></ul></li></ul></section><div id="rustdoc-modnav"><h2><a href="index.html">In rootcause::<wbr>hooks::<wbr>report_<wbr>formatting</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../../index.html">rootcause</a>::<wbr><a href="../index.html">hooks</a>::<wbr><a href="index.html">report_formatting</a></div><h1>Function <span class="fn">register_<wbr>report_<wbr>formatter_<wbr>hook</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../../src/rootcause/hooks/report_formatting.rs.html#293-296">Source</a> </span></div><pre class="rust item-decl"><code>pub fn register_report_formatter_hook(hook: impl <a class="trait" href="trait.ReportFormatterHook.html" title="trait rootcause::hooks::report_formatting::ReportFormatterHook">ReportFormatterHook</a>)</code></pre><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Registers a global report formatter hook.</p>
+<p>This function replaces any previously registered report formatter hook with
+the provided one. Only one report formatter hook can be active at a time,
+so registering a new hook will override the previous one.</p>
+<p>The hook will be used to format all reports created after registration.
+If no custom hook is registered, the default <a href="../builtin_hooks/report_formatter/struct.DefaultReportFormatter.html" title="struct rootcause::hooks::builtin_hooks::report_formatter::DefaultReportFormatter"><code>DefaultReportFormatter</code></a> is
+used.</p>
+<h2 id="examples"><a class="doc-anchor" href="#examples">§</a>Examples</h2><h3 id="registering-a-custom-formatter"><a class="doc-anchor" href="#registering-a-custom-formatter">§</a>Registering a Custom Formatter</h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::fmt;
+
+<span class="kw">use </span>rootcause::{
+    ReportRef,
+    hooks::report_formatting::{ReportFormatterHook, register_report_formatter_hook},
+    markers::{Local, Uncloneable},
+    prelude::<span class="kw-2">*</span>,
+};
+
+<span class="kw">struct </span>JsonFormatter;
+
+<span class="kw">fn </span>to_json(report: ReportRef&lt;<span class="lifetime">'_</span>, <span class="kw">dyn </span>Any, Uncloneable, Local&gt;) -&gt; serde_json::Value {
+    <span class="kw">let </span><span class="kw-2">mut </span>obj = serde_json::Map::new();
+    obj.insert(
+        <span class="string">"message"</span>.to_string(),
+        serde_json::Value::String(report.format_current_context_unhooked().to_string()),
+    );
+    <span class="comment">// TODO: Also add the attachments
+    </span><span class="kw">let </span><span class="kw-2">mut </span>causes = <span class="macro">vec!</span>[];
+    <span class="kw">for </span>subreport <span class="kw">in </span>report.children() {
+        causes.push(to_json(subreport.into_uncloneable()));
+    }
+    obj.insert(<span class="string">"causes"</span>.to_string(), serde_json::Value::Array(causes));
+    serde_json::Value::Object(obj)
+}
+
+<span class="kw">impl </span>ReportFormatterHook <span class="kw">for </span>JsonFormatter {
+    <span class="kw">fn </span>format_reports(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        reports: <span class="kw-2">&amp;</span>[ReportRef&lt;<span class="lifetime">'_</span>, <span class="kw">dyn </span>Any, Uncloneable, Local&gt;],
+        formatter: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;,
+        _function: rootcause::handlers::FormattingFunction,
+    ) -&gt; std::fmt::Result {
+        <span class="kw">let </span>causes = reports.iter().map(|<span class="kw-2">&amp;</span>report| to_json(report)).collect();
+        <span class="kw">let </span>json = serde_json::Value::Array(causes);
+        <span class="macro">write!</span>(formatter, <span class="string">"{}"</span>, json)
+    }
+}
+
+register_report_formatter_hook(JsonFormatter);</code></pre></div><h3 id="replacing-an-existing-formatter"><a class="doc-anchor" href="#replacing-an-existing-formatter">§</a>Replacing an Existing Formatter</h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>rootcause::{
+    ReportRef,
+    hooks::report_formatting::{ReportFormatterHook, register_report_formatter_hook},
+    markers::{Local, Uncloneable},
+    prelude::<span class="kw-2">*</span>,
+};
+
+<span class="kw">struct </span>FirstFormatter;
+<span class="kw">impl </span>ReportFormatterHook <span class="kw">for </span>FirstFormatter {
+    <span class="kw">fn </span>format_reports(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        reports: <span class="kw-2">&amp;</span>[ReportRef&lt;<span class="lifetime">'_</span>, <span class="kw">dyn </span>Any, Uncloneable, Local&gt;],
+        formatter: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;,
+        _function: rootcause::handlers::FormattingFunction,
+    ) -&gt; std::fmt::Result {
+        <span class="macro">write!</span>(formatter, <span class="string">"First formatter"</span>)
+    }
+}
+
+<span class="kw">struct </span>SecondFormatter;
+<span class="kw">impl </span>ReportFormatterHook <span class="kw">for </span>SecondFormatter {
+    <span class="kw">fn </span>format_reports(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        reports: <span class="kw-2">&amp;</span>[ReportRef&lt;<span class="lifetime">'_</span>, <span class="kw">dyn </span>Any, Uncloneable, Local&gt;],
+        formatter: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;,
+        _function: rootcause::handlers::FormattingFunction,
+    ) -&gt; std::fmt::Result {
+        <span class="macro">write!</span>(formatter, <span class="string">"Second formatter"</span>)
+    }
+}
+
+<span class="comment">// Register first formatter
+</span>register_report_formatter_hook(FirstFormatter);
+
+<span class="comment">// This replaces the first formatter - only SecondFormatter will be used
+</span>register_report_formatter_hook(SecondFormatter);</code></pre></div></div></details></section></div></main></body></html>

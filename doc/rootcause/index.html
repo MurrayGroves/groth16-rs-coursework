@@ -1,0 +1,206 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="A flexible, ergonomic, and inspectable error reporting library for Rust."><title>rootcause - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../static.files/rustdoc-e56847b5.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="rootcause" data-themes="" data-resource-suffix="" data-rustdoc-version="1.91.1 (ed61e7d7e 2025-11-07)" data-channel="1.91.1" data-search-js="search-e256b49e.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../static.files/storage-e2aeef58.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-6dc2a7f3.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-044be391.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">Crate rootcause</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../rootcause/index.html">rootcause</a><span class="version">0.10.0</span></h2></div><div class="sidebar-elems"><ul class="block"><li><a id="all-types" href="all.html">All Items</a></li></ul><section id="rustdoc-toc"><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#overview" title="Overview">Overview</a></li><li><a href="#quick-example" title="Quick Example">Quick Example</a></li><li><a href="#core-concepts" title="Core Concepts">Core Concepts</a></li><li><a href="#project-goals" title="Project Goals">Project Goals</a></li><li><a href="#report-type-parameters" title="Report Type Parameters">Report Type Parameters</a></li><li><a href="#type-parameters" title="Type Parameters">Type Parameters</a><ul><li><a href="#context-type-typed-vs-dynamic-errors" title="Context Type: Typed vs Dynamic Errors">Context Type: Typed vs Dynamic Errors</a></li><li><a href="#ownership-mutable-vs-cloneable" title="Ownership: Mutable vs Cloneable">Ownership: Mutable vs Cloneable</a></li><li><a href="#thread-safety-sendsync-vs-local" title="Thread Safety: SendSync vs Local">Thread Safety: SendSync vs Local</a></li></ul></li><li><a href="#converting-between-report-variants" title="Converting Between Report Variants">Converting Between Report Variants</a></li><li><a href="#acknowledgements" title="Acknowledgements">Acknowledgements</a></li></ul><h3><a href="#modules">Crate Items</a></h3><ul class="block"><li><a href="#modules" title="Modules">Modules</a></li><li><a href="#macros" title="Macros">Macros</a></li><li><a href="#structs" title="Structs">Structs</a></li><li><a href="#traits" title="Traits">Traits</a></li></ul></section><div id="rustdoc-modnav"></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content"><div class="main-heading"><h1>Crate <span>rootcause</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../src/rootcause/lib.rs.html#1-498">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>A flexible, ergonomic, and inspectable error reporting library for Rust.</p>
+<img src="https://github.com/rootcause-rs/rootcause/raw/main/rootcause.png" width="192">
+<h3 id="overview"><a class="doc-anchor" href="#overview">§</a>Overview</h3>
+<p>This crate provides a structured way to represent and work with errors and
+their context. The main goal is to enable you to build rich, structured
+error reports that automatically capture not just what went wrong, but also
+the context and supporting data at each step in the error’s propagation.</p>
+<p>Unlike simple string-based error messages, rootcause allows you to attach
+typed data to errors, build error chains, and inspect error contents
+programmatically. This makes debugging easier while still providing
+beautiful, human-readable error messages.</p>
+<h3 id="quick-example"><a class="doc-anchor" href="#quick-example">§</a>Quick Example</h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>rootcause::prelude::{Report, ResultExt};
+
+<span class="kw">fn </span>read_config(path: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String, Report&gt; {
+    std::fs::read_to_string(path).context(<span class="string">"Failed to read configuration file"</span>)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(String::new())
+}</code></pre></div>
+<p>For more examples, see the
+<a href="https://github.com/rootcause-rs/rootcause/tree/main/examples">examples directory</a>
+in the repository. Start with
+<a href="https://github.com/rootcause-rs/rootcause/blob/main/examples/basic.rs"><code>basic.rs</code></a>
+for a hands-on introduction.</p>
+<h3 id="core-concepts"><a class="doc-anchor" href="#core-concepts">§</a>Core Concepts</h3>
+<p>At a high level, rootcause helps you build a tree of error reports. Each
+node in the tree represents a step in the error’s history - you start with a
+root error, then add context and attachments as it propagates up through
+your code.</p>
+<p>Most error reports are linear chains (just like anyhow), but the tree
+structure lets you collect multiple related errors when needed.</p>
+<p>Each report has:</p>
+<ul>
+<li>A <strong>context</strong> (the error itself)</li>
+<li>Optional <strong>attachments</strong> (debugging data)</li>
+<li>Optional <strong>children</strong> (one or more errors that caused this error)</li>
+</ul>
+<p>For implementation details, see the <a href="../rootcause_internals/index.html" title="mod rootcause_internals"><code>rootcause-internals</code></a> crate.</p>
+<h3 id="project-goals"><a class="doc-anchor" href="#project-goals">§</a>Project Goals</h3>
+<ul>
+<li><strong>Ergonomic</strong>: The <code>?</code> operator should work with most error types, even
+ones not designed for this library.</li>
+<li><strong>Multi-failure tracking</strong>: When operations fail multiple times (retry
+attempts, batch processing, parallel execution), all failures should be
+captured and preserved in a single report.</li>
+<li><strong>Inspectable</strong>: The objects in a Report should not be glorified strings.
+Inspecting and interacting with them should be easy.</li>
+<li><strong>Optionally typed</strong>: Users should be able to (optionally) specify the
+type of the context in the root node.</li>
+<li><strong>Beautiful</strong>: The default formatting should look pleasant—and if it
+doesn’t match your style, the <a href="hooks/index.html" title="mod rootcause::hooks">hook system</a> lets you customize it.</li>
+<li><strong>Cloneable</strong>: It should be possible to clone a <a href="struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> when you need
+to.</li>
+<li><strong>Self-documenting</strong>: Reports should automatically capture information
+(like backtraces and locations) that might be useful in debugging.</li>
+<li><strong>Customizable</strong>: It should be possible to customize what data gets
+collected, or how reports are formatted.</li>
+<li><strong>Lightweight</strong>: <a href="struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> has a pointer-sized representation, keeping
+<code>Result&lt;T, Report&gt;</code> small and fast.</li>
+</ul>
+<h3 id="report-type-parameters"><a class="doc-anchor" href="#report-type-parameters">§</a>Report Type Parameters</h3>
+<p>The <a href="struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> type is generic over three parameters, but for most users the
+defaults work fine.</p>
+<p><strong>Most common usage:</strong></p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="comment">// Just use Report - works like anyhow::Error
+</span><span class="kw">fn </span>might_fail() -&gt; <span class="prelude-ty">Result</span>&lt;(), Report&gt; {
+}</code></pre></div>
+<p><strong>For type safety:</strong></p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attr">#[derive(Debug)]
+</span><span class="kw">struct </span>MyError;
+
+<span class="comment">// Use Report&lt;YourError&gt; - works like error-stack
+</span><span class="kw">fn </span>typed_error() -&gt; <span class="prelude-ty">Result</span>&lt;(), Report&lt;MyError&gt;&gt; {
+}</code></pre></div>
+<p><strong>Need cloning or thread-local data?</strong> The sections below explain the other
+type parameters. Come back to these when you need them - they solve specific
+problems you’ll recognize when you encounter them.</p>
+<hr />
+<h3 id="type-parameters"><a class="doc-anchor" href="#type-parameters">§</a>Type Parameters</h3>
+<p><em>This section covers the full type parameter system. Most users won’t need
+these variants immediately - but if you do need cloning, thread-local
+errors, or want to understand what’s possible, read on.</em></p>
+<p>The <a href="struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> type has three type parameters: <code>Report&lt;Context, Ownership, ThreadSafety&gt;</code>. This section explains all the options and when you’d use
+them.</p>
+<h4 id="context-type-typed-vs-dynamic-errors"><a class="doc-anchor" href="#context-type-typed-vs-dynamic-errors">§</a>Context Type: Typed vs Dynamic Errors</h4>
+<p><strong>Use <code>Report&lt;dyn Any&gt;</code></strong> (or just <a href="struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>) when errors just need to
+propagate. <strong>Use <code>Report&lt;YourErrorType&gt;</code></strong> when callers need to pattern
+match on specific error variants.</p>
+<p><strong><code>Report&lt;dyn Any&gt;</code></strong> (or just <a href="struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>) — Flexible, like <a href="https://docs.rs/anyhow"><code>anyhow</code></a></p>
+<p>Can hold any error type at the root. The <code>?</code> operator automatically converts
+any error into a <a href="struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>. Note: <code>dyn Any</code> is just a marker - no actual
+trait object is stored. Converting between typed and dynamic reports is
+zero-cost.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="comment">// Can return any error type
+</span><span class="kw">fn </span>might_fail() -&gt; <span class="prelude-ty">Result</span>&lt;(), Report&gt; {
+}</code></pre></div>
+<p><strong><code>Report&lt;YourErrorType&gt;</code></strong> — Type-safe, like <a href="https://docs.rs/error-stack"><code>error-stack</code></a></p>
+<p>The root error must be <code>YourErrorType</code>, but child errors can be anything.
+Callers can use <code>.current_context()</code> to pattern match on the typed error.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attr">#[derive(Debug)]
+</span><span class="kw">struct </span>ConfigError {<span class="comment">/* ... */</span>}
+
+<span class="comment">// This function MUST return ConfigError at the root
+</span><span class="kw">fn </span>load_config() -&gt; <span class="prelude-ty">Result</span>&lt;(), Report&lt;ConfigError&gt;&gt; {
+}</code></pre></div>
+<p>See <a href="https://github.com/rootcause-rs/rootcause/blob/main/examples/typed_reports.rs"><code>examples/typed_reports.rs</code></a> for a complete example with retry logic.</p>
+<h4 id="ownership-mutable-vs-cloneable"><a class="doc-anchor" href="#ownership-mutable-vs-cloneable">§</a>Ownership: Mutable vs Cloneable</h4>
+<p><strong>Use the default (<a href="markers/struct.Mutable.html" title="struct rootcause::markers::Mutable"><code>Mutable</code></a>)</strong> when errors just propagate with <code>?</code>.
+<strong>Use <a href="struct.Report.html#method.into_cloneable" title="method rootcause::Report::into_cloneable"><code>.into_cloneable()</code></a></strong> when you need to store errors in collections
+or use them multiple times.</p>
+<p><strong><a href="markers/struct.Mutable.html" title="struct rootcause::markers::Mutable"><code>Mutable</code></a></strong> (default) — Unique ownership</p>
+<p>You can add attachments and context to the root, but can’t clone the whole
+<a href="struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>. Note: child reports are still cloneable internally (they use
+<code>Arc</code>), but the top-level <a href="struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> doesn’t implement <code>Clone</code>. Start here,
+then convert to <a href="markers/struct.Cloneable.html" title="struct rootcause::markers::Cloneable"><code>Cloneable</code></a> if you need to clone the entire tree.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span><span class="kw-2">mut </span>report: Report&lt;String, markers::Mutable&gt; = <span class="macro">report!</span>(<span class="string">"error"</span>.to_string());
+<span class="kw">let </span>report = report.attach(<span class="string">"debug info"</span>); <span class="comment">// ✅ Can mutate root
+// let cloned = report.clone();           // ❌ Can't clone whole report</span></code></pre></div>
+<p><strong><a href="markers/struct.Cloneable.html" title="struct rootcause::markers::Cloneable"><code>Cloneable</code></a></strong> — Shared ownership</p>
+<p>The <a href="struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> can be cloned cheaply (via <code>Arc</code>), but can’t be mutated. Use
+when you need to pass the same error to multiple places.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span>report: Report&lt;String, markers::Mutable&gt; = <span class="macro">report!</span>(<span class="string">"error"</span>.to_string());
+<span class="kw">let </span>cloneable = report.into_cloneable();
+<span class="kw">let </span>copy1 = cloneable.clone(); <span class="comment">// ✅ Can clone
+</span><span class="kw">let </span>copy2 = cloneable.clone(); <span class="comment">// ✅ Cheap (Arc clone)
+// let modified = copy1.attach("info"); // ❌ Can't mutate</span></code></pre></div>
+<p>See <a href="https://github.com/rootcause-rs/rootcause/blob/main/examples/retry_with_collection.rs"><code>examples/retry_with_collection.rs</code></a> for collection usage.</p>
+<h4 id="thread-safety-sendsync-vs-local"><a class="doc-anchor" href="#thread-safety-sendsync-vs-local">§</a>Thread Safety: SendSync vs Local</h4>
+<p><strong>Use the default (<a href="markers/struct.SendSync.html" title="struct rootcause::markers::SendSync"><code>SendSync</code></a>)</strong> unless you get compiler errors about
+<code>Send</code> or <code>Sync</code>. <strong>Use <a href="markers/struct.Local.html" title="struct rootcause::markers::Local"><code>Local</code></a></strong> only when attaching <code>!Send</code> types like
+<code>Rc</code> or <code>Cell</code>.</p>
+<p><strong><a href="markers/struct.SendSync.html" title="struct rootcause::markers::SendSync"><code>SendSync</code></a></strong> (default) — Thread-safe</p>
+<p>The <a href="struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> and all its contents are <code>Send + Sync</code>. Most types (String,
+Vec, primitives) are already <code>Send + Sync</code>, so this just works.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let </span>report: Report&lt;String, markers::Mutable, markers::SendSync&gt; = <span class="macro">report!</span>(<span class="string">"error"</span>.to_string());
+
+std::thread::spawn(<span class="kw">move </span>|| {
+    <span class="macro">println!</span>(<span class="string">"{}"</span>, report); <span class="comment">// ✅ Can send to other threads
+</span>});</code></pre></div>
+<p><strong><a href="markers/struct.Local.html" title="struct rootcause::markers::Local"><code>Local</code></a></strong> — Not thread-safe</p>
+<p>Use when your error contains thread-local data like <code>Rc</code>, raw pointers, or
+other <code>!Send</code> types.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::rc::Rc;
+
+<span class="kw">let </span>data = Rc::new(<span class="string">"thread-local"</span>.to_string());
+<span class="kw">let </span>report: Report&lt;Rc&lt;String&gt;, markers::Mutable, markers::Local&gt; = <span class="macro">report!</span>(data);
+<span class="comment">// std::thread::spawn(move || { ... }); // ❌ Can't send to other threads</span></code></pre></div><h3 id="converting-between-report-variants"><a class="doc-anchor" href="#converting-between-report-variants">§</a>Converting Between Report Variants</h3>
+<p>The variant lists above have been ordered so that it is always possible to
+convert to an element further down the list using the <a href="https://doc.rust-lang.org/1.91.1/core/convert/trait.From.html" title="trait core::convert::From"><code>From</code></a> trait. This
+also means you can use <code>?</code> when converting downwards. There are also more
+specific methods (implemented using <a href="https://doc.rust-lang.org/1.91.1/core/convert/trait.From.html" title="trait core::convert::From"><code>From</code></a>) to help with type inference
+and to more clearly communicate intent:</p>
+<ul>
+<li><a href="struct.Report.html#method.into_dyn_any" title="method rootcause::Report::into_dyn_any"><code>Report::into_dyn_any</code></a> converts from <code>Report&lt;C, *, *&gt;</code> to <code>Report&lt;dyn Any, *, *&gt;</code>. See <a href="https://github.com/rootcause-rs/rootcause/blob/main/examples/error_coercion.rs"><code>examples/error_coercion.rs</code></a> for usage patterns.</li>
+<li><a href="struct.Report.html#method.into_cloneable" title="method rootcause::Report::into_cloneable"><code>Report::into_cloneable</code></a> converts from <code>Report&lt;*, Mutable, *&gt;</code> to
+<code>Report&lt;*, Cloneable, *&gt;</code>. See <a href="https://github.com/rootcause-rs/rootcause/blob/main/examples/retry_with_collection.rs"><code>examples/retry_with_collection.rs</code></a> for
+storing multiple errors.</li>
+<li><a href="struct.Report.html#method.into_local" title="method rootcause::Report::into_local"><code>Report::into_local</code></a> converts from <code>Report&lt;*, *, SendSync&gt;</code> to
+<code>Report&lt;*, *, Local&gt;</code>.</li>
+</ul>
+<p>On the other hand, it is generally harder to convert to an element further
+up the list. Here are some of the ways to do it:</p>
+<ul>
+<li>From <code>Report&lt;dyn Any, *, *&gt;</code> to <code>Report&lt;SomeContextType, *, *&gt;</code>:
+<ul>
+<li>You can check if the type of the root node matches a specific type by
+using <a href="struct.Report.html#method.downcast_report" title="method rootcause::Report::downcast_report"><code>Report::downcast_report</code></a>. This will return either the requested
+report type or the original report depending on whether the types match.
+See <a href="https://github.com/rootcause-rs/rootcause/blob/main/examples/inspecting_errors.rs"><code>examples/inspecting_errors.rs</code></a> for downcasting techniques.</li>
+</ul>
+</li>
+<li>From <code>Report&lt;*, Cloneable, *&gt;</code> to <code>Report&lt;*, Mutable, *&gt;</code>:
+<ul>
+<li>You can check if the root node only has a single owner using
+<a href="struct.Report.html#method.try_into_mutable" title="method rootcause::Report::try_into_mutable"><code>Report::try_into_mutable</code></a>. This will check the number of references
+to the root node and return either the requested report variant or the
+original report depending on whether it is unique.</li>
+<li>You can allocate a new root node and set the current node as a child of
+the new node. The new root node will be <a href="markers/struct.Mutable.html" title="struct rootcause::markers::Mutable"><code>Mutable</code></a>. One method for
+allocating a new root node is to call <a href="struct.Report.html#method.context" title="method rootcause::Report::context"><code>Report::context</code></a>.</li>
+</ul>
+</li>
+<li>From <code>Report&lt;*, *, *&gt;</code> to <code>Report&lt;PreformattedContext, Mutable, SendSync&gt;</code>:
+<ul>
+<li>You can preformat the entire <a href="struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> using <a href="struct.Report.html#method.preformat" title="method rootcause::Report::preformat"><code>Report::preformat</code></a>.
+This creates an entirely new <a href="struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> that has the same structure and
+will look the same as the current one if printed, but all contexts and
+attachments will be replaced with a <a href="preformatted/struct.PreformattedContext.html" title="struct rootcause::preformatted::PreformattedContext"><code>PreformattedContext</code></a> version.</li>
+</ul>
+</li>
+</ul>
+<h2 id="acknowledgements"><a class="doc-anchor" href="#acknowledgements">§</a>Acknowledgements</h2>
+<p>This library was inspired by and draws ideas from several existing error
+handling libraries in the Rust ecosystem, including <a href="https://docs.rs/anyhow"><code>anyhow</code></a>,
+<a href="https://docs.rs/thiserror"><code>thiserror</code></a>, and <a href="https://docs.rs/error-stack"><code>error-stack</code></a>.</p>
+</div></details><h2 id="modules" class="section-header">Modules<a href="#modules" class="anchor">§</a></h2><dl class="item-table"><dt><a class="mod" href="compat/index.html" title="mod rootcause::compat">compat</a></dt><dd>Compatibility and interoperability with other error handling libraries.</dd><dt><a class="mod" href="handlers/index.html" title="mod rootcause::handlers">handlers</a></dt><dd>Handlers that control how errors and attachments are formatted and
+displayed.</dd><dt><a class="mod" href="hooks/index.html" title="mod rootcause::hooks">hooks</a></dt><dd>Hooks system for customizing report creation and formatting behavior.</dd><dt><a class="mod" href="markers/index.html" title="mod rootcause::markers">markers</a></dt><dd>Marker types and traits for defining ownership and thread-safety semantics.</dd><dt><a class="mod" href="preformatted/index.html" title="mod rootcause::preformatted">preformatted</a></dt><dd>Preformatted context and attachment types.</dd><dt><a class="mod" href="prelude/index.html" title="mod rootcause::prelude">prelude</a></dt><dd>Commonly used items for convenient importing.</dd><dt><a class="mod" href="report_attachment/index.html" title="mod rootcause::report_attachment">report_<wbr>attachment</a></dt><dd>Individual attachments for error reports.</dd><dt><a class="mod" href="report_attachments/index.html" title="mod rootcause::report_attachments">report_<wbr>attachments</a></dt><dd>Collections of report attachments.</dd><dt><a class="mod" href="report_collection/index.html" title="mod rootcause::report_collection">report_<wbr>collection</a></dt><dd>Collections of reports.</dd></dl><h2 id="macros" class="section-header">Macros<a href="#macros" class="anchor">§</a></h2><dl class="item-table"><dt><a class="macro" href="macro.bail.html" title="macro rootcause::bail">bail</a></dt><dd>Returns early from a function with an error report.</dd><dt><a class="macro" href="macro.report.html" title="macro rootcause::report">report</a></dt><dd>Creates a new error report.</dd><dt><a class="macro" href="macro.report_attachment.html" title="macro rootcause::report_attachment">report_<wbr>attachment</a></dt><dd>Creates a report attachment with contextual data.</dd></dl><h2 id="structs" class="section-header">Structs<a href="#structs" class="anchor">§</a></h2><dl class="item-table"><dt><a class="struct" href="struct.Report.html" title="struct rootcause::Report">Report</a></dt><dd>An error report that contains a context, child reports, and attachments.</dd><dt><a class="struct" href="struct.ReportIter.html" title="struct rootcause::ReportIter">Report<wbr>Iter</a></dt><dd>An iterator over a report and all its descendant reports in depth-first
+order.</dd><dt><a class="struct" href="struct.ReportMut.html" title="struct rootcause::ReportMut">Report<wbr>Mut</a></dt><dd>A mutable reference to a <a href="struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</dd><dt><a class="struct" href="struct.ReportRef.html" title="struct rootcause::ReportRef">Report<wbr>Ref</a></dt><dd>A reference to a <a href="struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</dd></dl><h2 id="traits" class="section-header">Traits<a href="#traits" class="anchor">§</a></h2><dl class="item-table"><dt><a class="trait" href="trait.IntoReport.html" title="trait rootcause::IntoReport">Into<wbr>Report</a></dt><dd>Converts errors and reports into <a href="struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> instances with specific
+thread-safety markers.</dd><dt><a class="trait" href="trait.IntoReportCollection.html" title="trait rootcause::IntoReportCollection">Into<wbr>Report<wbr>Collection</a></dt><dd>Converts errors and reports into <a href="report_collection/struct.ReportCollection.html" title="struct rootcause::report_collection::ReportCollection"><code>ReportCollection</code></a> instances.</dd></dl></section></div></main></body></html>

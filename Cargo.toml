@@ -11,6 +11,7 @@ ark-ff = "*"
 ark-serialize = { version = "*", features = ["derive"] }
 
 serde = { version = "*", features = ["derive"] }
+serde_json = "*"
 itertools = "*"
 rand = "0.9"
 

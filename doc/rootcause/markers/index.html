@@ -1,0 +1,67 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Marker types and traits for defining ownership and thread-safety semantics."><title>rootcause::markers - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-e56847b5.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rootcause" data-themes="" data-resource-suffix="" data-rustdoc-version="1.91.1 (ed61e7d7e 2025-11-07)" data-channel="1.91.1" data-search-js="search-e256b49e.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../static.files/storage-e2aeef58.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../static.files/main-6dc2a7f3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">Module markers</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../rootcause/index.html">rootcause</a><span class="version">0.10.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Module markers</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#design-philosophy" title="Design Philosophy">Design Philosophy</a></li><li><a href="#ownership-markers" title="Ownership Markers">Ownership Markers</a></li><li><a href="#thread-safety-markers" title="Thread Safety Markers">Thread Safety Markers</a></li><li><a href="#examples" title="Examples">Examples</a><ul><li><a href="#creating-reports-with-different-ownership-semantics" title="Creating Reports with Different Ownership Semantics">Creating Reports with Different Ownership Semantics</a></li><li><a href="#working-with-thread-safety" title="Working with Thread Safety">Working with Thread Safety</a></li></ul></li></ul><h3><a href="#structs">Module Items</a></h3><ul class="block"><li><a href="#structs" title="Structs">Structs</a></li><li><a href="#traits" title="Traits">Traits</a></li></ul></section><div id="rustdoc-modnav"><h2 class="in-crate"><a href="../index.html">In crate rootcause</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../index.html">rootcause</a></div><h1>Module <span>markers</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../src/rootcause/markers.rs.html#1-507">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Marker types and traits for defining ownership and thread-safety semantics.</p>
+<p>This module provides type-level markers that control how reports and
+attachments behave with respect to ownership, cloning, and thread safety.
+These markers are used as generic parameters in types like <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report&lt;C, O, T&gt;</code></a> to encode compile-time guarantees about how data can be
+accessed and shared.</p>
+<h2 id="design-philosophy"><a class="doc-anchor" href="#design-philosophy">§</a>Design Philosophy</h2>
+<p>The constraints encoded by these markers are enforced at construction time.
+It is impossible to construct a <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>,
+<a href="../struct.ReportRef.html" title="struct rootcause::ReportRef"><code>ReportRef</code></a>, or
+<a href="../report_collection/struct.ReportCollection.html" title="struct rootcause::report_collection::ReportCollection"><code>ReportCollection</code></a> that violates the invariants
+associated with its marker types. This means you can trust that a
+<code>Report&lt;_, _, SendSync&gt;</code> truly is <code>Send + Sync</code>, and that a <code>Report&lt;_, Mutable&gt;</code> truly has unique ownership.</p>
+<h2 id="ownership-markers"><a class="doc-anchor" href="#ownership-markers">§</a>Ownership Markers</h2>
+<p>Ownership markers control whether reports and report references can be
+mutated and cloned.</p>
+<p>For owned reports (<a href="../struct.Report.html" title="struct rootcause::Report"><code>Report&lt;C, O, T&gt;</code></a>), the ownership marker
+<code>O</code> can be:</p>
+<ul>
+<li><a href="struct.Mutable.html" title="struct rootcause::markers::Mutable"><code>Mutable</code></a>: Unique ownership - the report can be mutated but not cloned</li>
+<li><a href="struct.Cloneable.html" title="struct rootcause::markers::Cloneable"><code>Cloneable</code></a>: Shared ownership - the report can be cloned but not mutated</li>
+</ul>
+<p>For report references (<a href="../struct.ReportRef.html" title="struct rootcause::ReportRef"><code>ReportRef&lt;C, O&gt;</code></a>), the ownership
+marker <code>O</code> can be:</p>
+<ul>
+<li><a href="struct.Cloneable.html" title="struct rootcause::markers::Cloneable"><code>Cloneable</code></a>: Enables <a href="../struct.ReportRef.html#method.clone_arc" title="method rootcause::ReportRef::clone_arc"><code>clone_arc</code></a> to get
+an owned report</li>
+<li><a href="struct.Uncloneable.html" title="struct rootcause::markers::Uncloneable"><code>Uncloneable</code></a>: Does not provide
+<a href="../struct.ReportRef.html#method.clone_arc" title="method rootcause::ReportRef::clone_arc"><code>clone_arc</code></a></li>
+</ul>
+<h2 id="thread-safety-markers"><a class="doc-anchor" href="#thread-safety-markers">§</a>Thread Safety Markers</h2>
+<p>Thread safety markers control whether reports can be sent between threads or
+shared across threads. These appear as the third type parameter (<code>T</code>) in
+<a href="../struct.Report.html" title="struct rootcause::Report"><code>Report&lt;C, O, T&gt;</code></a>:</p>
+<ul>
+<li><a href="struct.SendSync.html" title="struct rootcause::markers::SendSync"><code>SendSync</code></a>: The report and all its contents are <code>Send + Sync</code>, allowing
+the report to cross thread boundaries.</li>
+<li><a href="struct.Local.html" title="struct rootcause::markers::Local"><code>Local</code></a>: The report contains non-thread-safe data (like <code>Rc</code> or raw
+pointers) and cannot be sent between threads.</li>
+</ul>
+<h2 id="examples"><a class="doc-anchor" href="#examples">§</a>Examples</h2><h3 id="creating-reports-with-different-ownership-semantics"><a class="doc-anchor" href="#creating-reports-with-different-ownership-semantics">§</a>Creating Reports with Different Ownership Semantics</h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>rootcause::prelude::<span class="kw-2">*</span>;
+
+<span class="comment">// Mutable report - can be modified by adding context and attachments
+</span><span class="kw">let </span><span class="kw-2">mut </span>report: Report&lt;String, markers::Mutable&gt; = <span class="macro">report!</span>(<span class="string">"Error"</span>.to_string());
+<span class="kw">let </span>report: Report&lt;String, markers::Mutable&gt; = report.attach(<span class="string">"Additional context"</span>);
+
+<span class="comment">// Convert to cloneable report - can be cloned but not mutated
+</span><span class="kw">let </span>cloneable: Report&lt;String, markers::Cloneable&gt; = report.into_cloneable();
+<span class="kw">let </span>cloned: Report&lt;String, markers::Cloneable&gt; = cloneable.clone();
+<span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, cloneable), <span class="macro">format!</span>(<span class="string">"{}"</span>, cloned));</code></pre></div><h3 id="working-with-thread-safety"><a class="doc-anchor" href="#working-with-thread-safety">§</a>Working with Thread Safety</h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::rc::Rc;
+
+<span class="kw">use </span>rootcause::prelude::<span class="kw-2">*</span>;
+
+<span class="comment">// Thread-safe report with String (String is Send + Sync)
+</span><span class="kw">let </span>thread_safe: Report&lt;String, markers::Mutable, markers::SendSync&gt; =
+    <span class="macro">report!</span>(<span class="string">"Thread-safe error"</span>.to_string());
+
+<span class="comment">// Can be sent to another thread
+</span>std::thread::spawn(<span class="kw">move </span>|| {
+    <span class="macro">println!</span>(<span class="string">"{}"</span>, thread_safe);
+});
+
+<span class="comment">// Local report with Rc (Rc is !Send + !Sync)
+</span><span class="kw">let </span>local_data: Rc&lt;String&gt; = Rc::new(<span class="string">"Not thread-safe"</span>.to_string());
+<span class="kw">let </span>local_report: Report&lt;Rc&lt;String&gt;, markers::Mutable, markers::Local&gt; = <span class="macro">report!</span>(local_data);
+<span class="comment">// local_report cannot be sent to another thread - won't compile</span></code></pre></div></div></details><h2 id="structs" class="section-header">Structs<a href="#structs" class="anchor">§</a></h2><dl class="item-table"><dt><a class="struct" href="struct.Cloneable.html" title="struct rootcause::markers::Cloneable">Cloneable</a></dt><dd>Marker type for cloneable reports and report references.</dd><dt><a class="struct" href="struct.Local.html" title="struct rootcause::markers::Local">Local</a></dt><dd>Marker type indicating that a report is not <code>Send</code> or <code>Sync</code>.</dd><dt><a class="struct" href="struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a></dt><dd>Marker type for owned reports with unique ownership.</dd><dt><a class="struct" href="struct.SendSync.html" title="struct rootcause::markers::SendSync">Send<wbr>Sync</a></dt><dd>Marker type indicating that a report and all its contents are <code>Send + Sync</code>.</dd><dt><a class="struct" href="struct.Uncloneable.html" title="struct rootcause::markers::Uncloneable">Uncloneable</a></dt><dd>Marker type for non-cloneable report references.</dd></dl><h2 id="traits" class="section-header">Traits<a href="#traits" class="anchor">§</a></h2><dl class="item-table"><dt><a class="trait" href="trait.ObjectMarkerFor.html" title="trait rootcause::markers::ObjectMarkerFor">Object<wbr>Marker<wbr>For</a></dt><dd>Marker trait combining object and thread-safety requirements.</dd><dt><a class="trait" href="trait.ReportOwnershipMarker.html" title="trait rootcause::markers::ReportOwnershipMarker">Report<wbr>Ownership<wbr>Marker</a></dt><dd>Marker trait for ownership semantics of owned reports.</dd></dl></section></div></main></body></html>

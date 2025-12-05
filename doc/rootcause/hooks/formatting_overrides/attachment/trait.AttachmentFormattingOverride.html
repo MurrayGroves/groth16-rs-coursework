@@ -1,0 +1,172 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Trait for customizing how attachments of a specific type are formatted in error reports."><title>AttachmentFormattingOverride in rootcause::hooks::formatting_overrides::attachment - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-e56847b5.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="rootcause" data-themes="" data-resource-suffix="" data-rustdoc-version="1.91.1 (ed61e7d7e 2025-11-07)" data-channel="1.91.1" data-search-js="search-e256b49e.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../../../static.files/storage-e2aeef58.js"></script><script defer src="sidebar-items.js"></script><script defer src="../../../../static.files/main-6dc2a7f3.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc trait"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">AttachmentFormattingOverride</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../../rootcause/index.html">rootcause</a><span class="version">0.10.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Attachment<wbr>Formatting<wbr>Override</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#type-parameters" title="Type Parameters">Type Parameters</a></li><li><a href="#default-implementations" title="Default Implementations">Default Implementations</a></li><li><a href="#examples" title="Examples">Examples</a></li></ul><h3><a href="#provided-methods">Provided Methods</a></h3><ul class="block"><li><a href="#method.debug" title="debug">debug</a></li><li><a href="#method.debug_preformatted" title="debug_preformatted">debug_preformatted</a></li><li><a href="#method.display" title="display">display</a></li><li><a href="#method.display_preformatted" title="display_preformatted">display_preformatted</a></li><li><a href="#method.preferred_formatting_style" title="preferred_formatting_style">preferred_formatting_style</a></li></ul><h3><a href="#implementors">Implementors</a></h3></section><div id="rustdoc-modnav"><h2><a href="index.html">In rootcause::<wbr>hooks::<wbr>formatting_<wbr>overrides::<wbr>attachment</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../../../index.html">rootcause</a>::<wbr><a href="../../index.html">hooks</a>::<wbr><a href="../index.html">formatting_overrides</a>::<wbr><a href="index.html">attachment</a></div><h1>Trait <span class="trait">Attachment<wbr>Formatting<wbr>Override</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../../../src/rootcause/hooks/formatting_overrides/attachment.rs.html#361-491">Source</a> </span></div><pre class="rust item-decl"><code>pub trait AttachmentFormattingOverride&lt;A&gt;:
+    'static
+    + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a>
+    + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a> {
+    // Provided methods
+    fn <a href="#method.display" class="fn">display</a>(
+        &amp;self,
+        attachment: <a class="struct" href="../../../report_attachment/struct.ReportAttachmentRef.html" title="struct rootcause::report_attachment::ReportAttachmentRef">ReportAttachmentRef</a>&lt;'_, A&gt;,
+        attachment_parent: <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="struct.AttachmentParent.html" title="struct rootcause::hooks::formatting_overrides::attachment::AttachmentParent">AttachmentParent</a>&lt;'_&gt;&gt;,
+        formatter: &amp;mut <a class="struct" href="https://doc.rust-lang.org/1.91.1/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>&lt;'_&gt;,
+    ) -&gt; <a class="type" href="https://doc.rust-lang.org/1.91.1/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a> { ... }
+<span class="item-spacer"></span>    fn <a href="#method.display_preformatted" class="fn">display_preformatted</a>(
+        &amp;self,
+        attachment: <a class="struct" href="../../../report_attachment/struct.ReportAttachmentRef.html" title="struct rootcause::report_attachment::ReportAttachmentRef">ReportAttachmentRef</a>&lt;'_, <a class="struct" href="../../../preformatted/struct.PreformattedAttachment.html" title="struct rootcause::preformatted::PreformattedAttachment">PreformattedAttachment</a>&gt;,
+        attachment_parent: <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="struct.AttachmentParent.html" title="struct rootcause::hooks::formatting_overrides::attachment::AttachmentParent">AttachmentParent</a>&lt;'_&gt;&gt;,
+        formatter: &amp;mut <a class="struct" href="https://doc.rust-lang.org/1.91.1/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>&lt;'_&gt;,
+    ) -&gt; <a class="type" href="https://doc.rust-lang.org/1.91.1/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a> { ... }
+<span class="item-spacer"></span>    fn <a href="#method.debug" class="fn">debug</a>(
+        &amp;self,
+        attachment: <a class="struct" href="../../../report_attachment/struct.ReportAttachmentRef.html" title="struct rootcause::report_attachment::ReportAttachmentRef">ReportAttachmentRef</a>&lt;'_, A&gt;,
+        attachment_parent: <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="struct.AttachmentParent.html" title="struct rootcause::hooks::formatting_overrides::attachment::AttachmentParent">AttachmentParent</a>&lt;'_&gt;&gt;,
+        formatter: &amp;mut <a class="struct" href="https://doc.rust-lang.org/1.91.1/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>&lt;'_&gt;,
+    ) -&gt; <a class="type" href="https://doc.rust-lang.org/1.91.1/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a> { ... }
+<span class="item-spacer"></span>    fn <a href="#method.debug_preformatted" class="fn">debug_preformatted</a>(
+        &amp;self,
+        attachment: <a class="struct" href="../../../report_attachment/struct.ReportAttachmentRef.html" title="struct rootcause::report_attachment::ReportAttachmentRef">ReportAttachmentRef</a>&lt;'_, <a class="struct" href="../../../preformatted/struct.PreformattedAttachment.html" title="struct rootcause::preformatted::PreformattedAttachment">PreformattedAttachment</a>&gt;,
+        attachment_parent: <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="struct.AttachmentParent.html" title="struct rootcause::hooks::formatting_overrides::attachment::AttachmentParent">AttachmentParent</a>&lt;'_&gt;&gt;,
+        formatter: &amp;mut <a class="struct" href="https://doc.rust-lang.org/1.91.1/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>&lt;'_&gt;,
+    ) -&gt; <a class="type" href="https://doc.rust-lang.org/1.91.1/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a> { ... }
+<span class="item-spacer"></span>    fn <a href="#method.preferred_formatting_style" class="fn">preferred_formatting_style</a>(
+        &amp;self,
+        attachment: <a class="struct" href="../../../report_attachment/struct.ReportAttachmentRef.html" title="struct rootcause::report_attachment::ReportAttachmentRef">ReportAttachmentRef</a>&lt;'_, dyn <a class="trait" href="../../../prelude/trait.Any.html" title="trait rootcause::prelude::Any">Any</a>&gt;,
+        report_formatting_function: <a class="enum" href="../../../handlers/enum.FormattingFunction.html" title="enum rootcause::handlers::FormattingFunction">FormattingFunction</a>,
+    ) -&gt; <a class="struct" href="../../../handlers/struct.AttachmentFormattingStyle.html" title="struct rootcause::handlers::AttachmentFormattingStyle">AttachmentFormattingStyle</a> { ... }
+}</code></pre><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Trait for customizing how attachments of a specific type are formatted in
+error reports.</p>
+<p>This trait allows you to override the default formatting behavior for
+attachments of type <code>A</code>. You can customize both Display and Debug
+formatting, as well as handle preformatted attachments and specify preferred
+formatting styles.</p>
+<h2 id="type-parameters"><a class="doc-anchor" href="#type-parameters">§</a>Type Parameters</h2>
+<ul>
+<li><code>A</code> - The attachment type that this formatter handles</li>
+</ul>
+<h2 id="default-implementations"><a class="doc-anchor" href="#default-implementations">§</a>Default Implementations</h2>
+<p>All methods have default implementations that delegate to the unhooked
+formatting, so you only need to override the methods for the formatting you
+want to customize.</p>
+<h2 id="examples"><a class="doc-anchor" href="#examples">§</a>Examples</h2>
+<p>Basic custom Display formatting:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>core::fmt;
+
+<span class="kw">use </span>rootcause::{
+    hooks::formatting_overrides::attachment::{AttachmentFormattingOverride, AttachmentParent},
+    report_attachment::ReportAttachmentRef,
+};
+
+<span class="kw">struct </span>MyData {
+    value: i32,
+    name: String,
+}
+
+<span class="kw">struct </span>MyDataFormatter;
+
+<span class="kw">impl </span>AttachmentFormattingOverride&lt;MyData&gt; <span class="kw">for </span>MyDataFormatter {
+    <span class="kw">fn </span>display(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attachment: ReportAttachmentRef&lt;<span class="lifetime">'_</span>, MyData&gt;,
+        _parent: <span class="prelude-ty">Option</span>&lt;AttachmentParent&lt;<span class="lifetime">'_</span>&gt;&gt;,
+        f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;,
+    ) -&gt; fmt::Result {
+        <span class="kw">let </span>data = attachment.inner();
+        <span class="macro">write!</span>(f, <span class="string">"{}: {}"</span>, data.name, data.value)
+    }
+}</code></pre></div></div></details><h2 id="provided-methods" class="section-header">Provided Methods<a href="#provided-methods" class="anchor">§</a></h2><div class="methods"><details class="toggle method-toggle" open><summary><section id="method.display" class="method"><a class="src rightside" href="../../../../src/rootcause/hooks/formatting_overrides/attachment.rs.html#398-406">Source</a><h4 class="code-header">fn <a href="#method.display" class="fn">display</a>(
+    &amp;self,
+    attachment: <a class="struct" href="../../../report_attachment/struct.ReportAttachmentRef.html" title="struct rootcause::report_attachment::ReportAttachmentRef">ReportAttachmentRef</a>&lt;'_, A&gt;,
+    attachment_parent: <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="struct.AttachmentParent.html" title="struct rootcause::hooks::formatting_overrides::attachment::AttachmentParent">AttachmentParent</a>&lt;'_&gt;&gt;,
+    formatter: &amp;mut <a class="struct" href="https://doc.rust-lang.org/1.91.1/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>&lt;'_&gt;,
+) -&gt; <a class="type" href="https://doc.rust-lang.org/1.91.1/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></h4></section></summary><div class="docblock"><p>Formats the attachment using Display formatting.</p>
+<p>This method is called when the attachment needs to be displayed in a
+user-friendly format. The default implementation delegates to the
+attachment’s unhooked Display formatting.</p>
+<h5 id="arguments"><a class="doc-anchor" href="#arguments">§</a>Arguments</h5>
+<ul>
+<li><code>attachment</code> - Reference to the attachment being formatted</li>
+<li><code>attachment_parent</code> - Optional context about the parent report</li>
+<li><code>formatter</code> - The formatter to write output to</li>
+</ul>
+<h5 id="examples-1"><a class="doc-anchor" href="#examples-1">§</a>Examples</h5>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>core::fmt;
+
+<span class="kw">use </span>rootcause::{
+    hooks::formatting_overrides::attachment::{AttachmentFormattingOverride, AttachmentParent},
+    report_attachment::ReportAttachmentRef,
+};
+
+<span class="kw">struct </span>ErrorCode(u32);
+<span class="kw">struct </span>ErrorCodeFormatter;
+
+<span class="kw">impl </span>AttachmentFormattingOverride&lt;ErrorCode&gt; <span class="kw">for </span>ErrorCodeFormatter {
+    <span class="kw">fn </span>display(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attachment: ReportAttachmentRef&lt;<span class="lifetime">'_</span>, ErrorCode&gt;,
+        _parent: <span class="prelude-ty">Option</span>&lt;AttachmentParent&lt;<span class="lifetime">'_</span>&gt;&gt;,
+        f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;,
+    ) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">"Error Code: 0x{:04X}"</span>, attachment.inner().<span class="number">0</span>)
+    }
+}</code></pre></div></div></details><details class="toggle method-toggle" open><summary><section id="method.display_preformatted" class="method"><a class="src rightside" href="../../../../src/rootcause/hooks/formatting_overrides/attachment.rs.html#419-427">Source</a><h4 class="code-header">fn <a href="#method.display_preformatted" class="fn">display_preformatted</a>(
+    &amp;self,
+    attachment: <a class="struct" href="../../../report_attachment/struct.ReportAttachmentRef.html" title="struct rootcause::report_attachment::ReportAttachmentRef">ReportAttachmentRef</a>&lt;'_, <a class="struct" href="../../../preformatted/struct.PreformattedAttachment.html" title="struct rootcause::preformatted::PreformattedAttachment">PreformattedAttachment</a>&gt;,
+    attachment_parent: <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="struct.AttachmentParent.html" title="struct rootcause::hooks::formatting_overrides::attachment::AttachmentParent">AttachmentParent</a>&lt;'_&gt;&gt;,
+    formatter: &amp;mut <a class="struct" href="https://doc.rust-lang.org/1.91.1/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>&lt;'_&gt;,
+) -&gt; <a class="type" href="https://doc.rust-lang.org/1.91.1/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></h4></section></summary><div class="docblock"><p>Formats a preformatted attachment using Display formatting.</p>
+<p>This method handles attachments that have been preformatted (typically
+done using <a href="../../../struct.ReportRef.html#method.preformat" title="method rootcause::ReportRef::preformat"><code>ReportRef::preformat</code></a>). The default implementation
+delegates to the attachment’s unhooked Display formatting.</p>
+<h5 id="arguments-1"><a class="doc-anchor" href="#arguments-1">§</a>Arguments</h5>
+<ul>
+<li><code>attachment</code> - Reference to the preformatted attachment</li>
+<li><code>attachment_parent</code> - Optional context about the parent report</li>
+<li><code>formatter</code> - The formatter to write output to</li>
+</ul>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.debug" class="method"><a class="src rightside" href="../../../../src/rootcause/hooks/formatting_overrides/attachment.rs.html#440-448">Source</a><h4 class="code-header">fn <a href="#method.debug" class="fn">debug</a>(
+    &amp;self,
+    attachment: <a class="struct" href="../../../report_attachment/struct.ReportAttachmentRef.html" title="struct rootcause::report_attachment::ReportAttachmentRef">ReportAttachmentRef</a>&lt;'_, A&gt;,
+    attachment_parent: <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="struct.AttachmentParent.html" title="struct rootcause::hooks::formatting_overrides::attachment::AttachmentParent">AttachmentParent</a>&lt;'_&gt;&gt;,
+    formatter: &amp;mut <a class="struct" href="https://doc.rust-lang.org/1.91.1/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>&lt;'_&gt;,
+) -&gt; <a class="type" href="https://doc.rust-lang.org/1.91.1/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></h4></section></summary><div class="docblock"><p>Formats the attachment using Debug formatting.</p>
+<p>This method is called when the attachment needs to be displayed in a
+debug-friendly format. The default
+implementation delegates to the attachment’s unhooked Debug formatting.</p>
+<h5 id="arguments-2"><a class="doc-anchor" href="#arguments-2">§</a>Arguments</h5>
+<ul>
+<li><code>attachment</code> - Reference to the attachment being formatted</li>
+<li><code>attachment_parent</code> - Optional context about the parent report</li>
+<li><code>formatter</code> - The formatter to write output to</li>
+</ul>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.debug_preformatted" class="method"><a class="src rightside" href="../../../../src/rootcause/hooks/formatting_overrides/attachment.rs.html#461-469">Source</a><h4 class="code-header">fn <a href="#method.debug_preformatted" class="fn">debug_preformatted</a>(
+    &amp;self,
+    attachment: <a class="struct" href="../../../report_attachment/struct.ReportAttachmentRef.html" title="struct rootcause::report_attachment::ReportAttachmentRef">ReportAttachmentRef</a>&lt;'_, <a class="struct" href="../../../preformatted/struct.PreformattedAttachment.html" title="struct rootcause::preformatted::PreformattedAttachment">PreformattedAttachment</a>&gt;,
+    attachment_parent: <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="struct.AttachmentParent.html" title="struct rootcause::hooks::formatting_overrides::attachment::AttachmentParent">AttachmentParent</a>&lt;'_&gt;&gt;,
+    formatter: &amp;mut <a class="struct" href="https://doc.rust-lang.org/1.91.1/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>&lt;'_&gt;,
+) -&gt; <a class="type" href="https://doc.rust-lang.org/1.91.1/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></h4></section></summary><div class="docblock"><p>Formats a preformatted attachment using Debug formatting.</p>
+<p>This method handles attachments that have been preformatted (typically
+done using <a href="../../../struct.ReportRef.html#method.preformat" title="method rootcause::ReportRef::preformat"><code>ReportRef::preformat</code></a>). The default implementation
+delegates to the attachment’s unhooked Debug formatting.</p>
+<h5 id="arguments-3"><a class="doc-anchor" href="#arguments-3">§</a>Arguments</h5>
+<ul>
+<li><code>attachment</code> - Reference to the preformatted attachment</li>
+<li><code>attachment_parent</code> - Optional context about the parent report</li>
+<li><code>formatter</code> - The formatter to write output to</li>
+</ul>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.preferred_formatting_style" class="method"><a class="src rightside" href="../../../../src/rootcause/hooks/formatting_overrides/attachment.rs.html#484-490">Source</a><h4 class="code-header">fn <a href="#method.preferred_formatting_style" class="fn">preferred_formatting_style</a>(
+    &amp;self,
+    attachment: <a class="struct" href="../../../report_attachment/struct.ReportAttachmentRef.html" title="struct rootcause::report_attachment::ReportAttachmentRef">ReportAttachmentRef</a>&lt;'_, dyn <a class="trait" href="../../../prelude/trait.Any.html" title="trait rootcause::prelude::Any">Any</a>&gt;,
+    report_formatting_function: <a class="enum" href="../../../handlers/enum.FormattingFunction.html" title="enum rootcause::handlers::FormattingFunction">FormattingFunction</a>,
+) -&gt; <a class="struct" href="../../../handlers/struct.AttachmentFormattingStyle.html" title="struct rootcause::handlers::AttachmentFormattingStyle">AttachmentFormattingStyle</a></h4></section></summary><div class="docblock"><p>Determines the preferred formatting style for this attachment.</p>
+<p>This method allows the formatter to specify how the attachment should be
+presented in the overall report structure (inline, with header, in
+appendix, etc.). The default implementation delegates to the
+attachment’s unhooked preference.</p>
+<h5 id="arguments-4"><a class="doc-anchor" href="#arguments-4">§</a>Arguments</h5>
+<ul>
+<li><code>attachment</code> - Reference to the attachment (as <code>dyn Any</code> as it can be
+either <code>A</code> or a <a href="../../../preformatted/struct.PreformattedAttachment.html" title="struct rootcause::preformatted::PreformattedAttachment"><code>PreformattedAttachment</code></a>)</li>
+<li><code>report_formatting_function</code> - Whether the overall report uses Display
+or Debug formatting</li>
+</ul>
+</div></details></div><h2 id="implementors" class="section-header">Implementors<a href="#implementors" class="anchor">§</a></h2><div id="implementors-list"></div><script src="../../../../trait.impl/rootcause/hooks/formatting_overrides/attachment/trait.AttachmentFormattingOverride.js" async></script></section></div></main></body></html>

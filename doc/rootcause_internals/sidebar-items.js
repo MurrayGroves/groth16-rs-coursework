@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["handlers"],"struct":["RawAttachment","RawAttachmentRef","RawReport","RawReportMut","RawReportRef"]};

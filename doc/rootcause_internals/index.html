@@ -1,0 +1,67 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Internal implementation crate for `rootcause`."><title>rootcause_internals - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../static.files/rustdoc-e56847b5.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="rootcause_internals" data-themes="" data-resource-suffix="" data-rustdoc-version="1.91.1 (ed61e7d7e 2025-11-07)" data-channel="1.91.1" data-search-js="search-e256b49e.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../static.files/storage-e2aeef58.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-6dc2a7f3.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-044be391.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">Crate rootcause_internals</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../rootcause_internals/index.html">rootcause_<wbr>internals</a><span class="version">0.10.0</span></h2></div><div class="sidebar-elems"><ul class="block"><li><a id="all-types" href="all.html">All Items</a></li></ul><section id="rustdoc-toc"><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#overview" title="Overview">Overview</a></li><li><a href="#architecture" title="Architecture">Architecture</a></li><li><a href="#safety-strategy" title="Safety Strategy">Safety Strategy</a></li></ul><h3><a href="#modules">Crate Items</a></h3><ul class="block"><li><a href="#modules" title="Modules">Modules</a></li><li><a href="#structs" title="Structs">Structs</a></li></ul></section><div id="rustdoc-modnav"></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content"><div class="main-heading"><h1>Crate <span>rootcause_<wbr>internals</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../src/rootcause_internals/lib.rs.html#1-90">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Internal implementation crate for <a href="https://docs.rs/rootcause/latest/rootcause/"><code>rootcause</code></a>.</p>
+<h2 id="overview"><a class="doc-anchor" href="#overview">§</a>Overview</h2>
+<p>This crate contains the low-level, type-erased data structures and unsafe
+operations that power the <a href="https://docs.rs/rootcause/latest/rootcause/"><code>rootcause</code></a> error reporting library. It provides
+the foundation for zero-cost type erasure through vtable-based dispatch.</p>
+<p><strong>This crate is an implementation detail.</strong> No semantic versioning
+guarantees are provided. Users should depend on the <a href="https://docs.rs/rootcause/latest/rootcause/"><code>rootcause</code></a> crate, not
+this one.</p>
+<h2 id="architecture"><a class="doc-anchor" href="#architecture">§</a>Architecture</h2>
+<p>The crate is organized around two parallel type hierarchies for attachments
+and reports:</p>
+<ul>
+<li>
+<p><strong>[<code>attachment</code>]</strong>: Type-erased attachment storage</p>
+<ul>
+<li><a href="struct.RawAttachment.html" title="struct rootcause_internals::RawAttachment"><code>RawAttachment</code></a>: Owned attachment with <a href="https://doc.rust-lang.org/1.91.1/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box"><code>Box</code></a>-based allocation</li>
+<li><a href="struct.RawAttachmentRef.html" title="struct rootcause_internals::RawAttachmentRef"><code>RawAttachmentRef</code></a>: Borrowed reference to an attachment</li>
+<li><a href="attachment::data::AttachmentData"><code>AttachmentData</code></a>: <code>#[repr(C)]</code> wrapper enabling field access on erased
+types</li>
+<li><a href="attachment::vtable::AttachmentVtable"><code>AttachmentVtable</code></a>: Function pointers for type-erased dispatch</li>
+</ul>
+</li>
+<li>
+<p><strong>[<code>report</code>]</strong>: Type-erased report storage (similar structure)</p>
+<ul>
+<li><a href="struct.RawReport.html" title="struct rootcause_internals::RawReport"><code>RawReport</code></a>: Owned report with <a href="../triomphe/arc/struct.Arc.html" title="struct triomphe::arc::Arc"><code>Arc</code></a>-based allocation</li>
+<li><a href="struct.RawReportRef.html" title="struct rootcause_internals::RawReportRef"><code>RawReportRef</code></a>/<a href="struct.RawReportMut.html" title="struct rootcause_internals::RawReportMut"><code>RawReportMut</code></a>: Borrowed references (shared/mutable)</li>
+<li><a href="report::data::ReportData"><code>ReportData</code></a>: <code>#[repr(C)]</code> wrapper for field access</li>
+<li><a href="report::vtable::ReportVtable"><code>ReportVtable</code></a>: Function pointers for dispatch</li>
+</ul>
+</li>
+<li>
+<p><strong><a href="handlers/index.html" title="mod rootcause_internals::handlers"><code>handlers</code></a></strong>: Trait definitions for formatting and behavior</p>
+<ul>
+<li><a href="handlers/trait.ContextHandler.html" title="trait rootcause_internals::handlers::ContextHandler"><code>ContextHandler</code></a>: Defines how error contexts are formatted</li>
+<li><a href="handlers/trait.AttachmentHandler.html" title="trait rootcause_internals::handlers::AttachmentHandler"><code>AttachmentHandler</code></a>: Defines how attachments are formatted</li>
+</ul>
+</li>
+</ul>
+<h2 id="safety-strategy"><a class="doc-anchor" href="#safety-strategy">§</a>Safety Strategy</h2>
+<p>Type erasure requires careful handling to maintain Rust’s type safety
+guarantees. When we erase a type like <code>AttachmentData&lt;MyError&gt;</code> to
+<code>AttachmentData&lt;Erased&gt;</code>, we must ensure that the vtable function pointers
+still match the actual concrete type stored in memory.</p>
+<p>This crate maintains safety through:</p>
+<ul>
+<li><strong>Module-based encapsulation</strong>: Safety-critical types keep fields
+module-private, making invariants locally verifiable within a single file</li>
+<li><strong><code>#[repr(C)]</code> layout</strong>: Enables safe field projection on type-erased
+pointers without constructing invalid references</li>
+<li><strong>Documented vtable contracts</strong>: Each vtable method specifies exactly when
+it can be safely called</li>
+</ul>
+<p>See the individual module documentation ([<code>attachment</code>], [<code>report</code>]) for
+detailed explanations of how these patterns are applied.</p>
+</div></details><h2 id="modules" class="section-header">Modules<a href="#modules" class="anchor">§</a></h2><dl class="item-table"><dt><a class="mod" href="handlers/index.html" title="mod rootcause_internals::handlers">handlers</a></dt><dd>Handlers that define formatting and error-chaining behavior for reports and
+attachments.</dd></dl><h2 id="structs" class="section-header">Structs<a href="#structs" class="anchor">§</a></h2><dl class="item-table"><dt><a class="struct" href="struct.RawAttachment.html" title="struct rootcause_internals::RawAttachment">RawAttachment</a></dt><dd>A pointer to an [<code>AttachmentData</code>] that is guaranteed to point to an
+initialized instance of an [<code>AttachmentData&lt;A&gt;</code>] for some specific <code>A</code>,
+though we do not know which actual <code>A</code> it is.</dd><dt><a class="struct" href="struct.RawAttachmentRef.html" title="struct rootcause_internals::RawAttachmentRef">RawAttachment<wbr>Ref</a></dt><dd>A lifetime-bound pointer to an [<code>AttachmentData</code>] that is guaranteed to
+point to an initialized instance of an [<code>AttachmentData&lt;A&gt;</code>] for some
+specific <code>A</code>, though we do not know which actual <code>A</code> it is.</dd><dt><a class="struct" href="struct.RawReport.html" title="struct rootcause_internals::RawReport">RawReport</a></dt><dd>A pointer to a [<code>ReportData</code>] that is guaranteed to point to an initialized
+instance of a [<code>ReportData&lt;C&gt;</code>] for some specific <code>C</code>, though we do not know
+which actual <code>C</code> it is.</dd><dt><a class="struct" href="struct.RawReportMut.html" title="struct rootcause_internals::RawReportMut">RawReport<wbr>Mut</a></dt><dd>A mutable lifetime-bound pointer to a [<code>ReportData</code>] that is guaranteed to
+point to an initialized instance of a [<code>ReportData&lt;C&gt;</code>] for some specific
+<code>C</code>, though we do not know which actual <code>C</code> it is.</dd><dt><a class="struct" href="struct.RawReportRef.html" title="struct rootcause_internals::RawReportRef">RawReport<wbr>Ref</a></dt><dd>A lifetime-bound pointer to a [<code>ReportData</code>] that is guaranteed to point
+to an initialized instance of a [<code>ReportData&lt;C&gt;</code>] for some specific <code>C</code>,
+though we do not know which actual <code>C</code> it is.</dd></dl></section></div></main></body></html>

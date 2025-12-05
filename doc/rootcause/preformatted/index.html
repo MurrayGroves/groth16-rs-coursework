@@ -1,0 +1,64 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Preformatted context and attachment types."><title>rootcause::preformatted - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-e56847b5.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rootcause" data-themes="" data-resource-suffix="" data-rustdoc-version="1.91.1 (ed61e7d7e 2025-11-07)" data-channel="1.91.1" data-search-js="search-e256b49e.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../static.files/storage-e2aeef58.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../static.files/main-6dc2a7f3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">Module preformatted</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../rootcause/index.html">rootcause</a><span class="version">0.10.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Module preformatted</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#overview" title="Overview">Overview</a></li><li><a href="#why-preformat" title="Why Preformat?">Why Preformat?</a></li><li><a href="#usage" title="Usage">Usage</a></li><li><a href="#non-sendsync-example" title="Non-Send/Sync Example">Non-Send/Sync Example</a></li></ul><h3><a href="#structs">Module Items</a></h3><ul class="block"><li><a href="#structs" title="Structs">Structs</a></li></ul></section><div id="rustdoc-modnav"><h2 class="in-crate"><a href="../index.html">In crate rootcause</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../index.html">rootcause</a></div><h1>Module <span>preformatted</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../src/rootcause/preformatted.rs.html#1-367">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Preformatted context and attachment types.</p>
+<h2 id="overview"><a class="doc-anchor" href="#overview">§</a>Overview</h2>
+<p>This module provides types that store preformatted <code>String</code> representations
+of report contexts and attachments. These types are primarily used through
+the <a href="../struct.Report.html#method.preformat" title="method rootcause::Report::preformat"><code>Report::preformat</code></a> method, which converts any report into a version
+where all contexts and attachments have been formatted into strings.</p>
+<h2 id="why-preformat"><a class="doc-anchor" href="#why-preformat">§</a>Why Preformat?</h2>
+<p>Preformatting a report is useful in several scenarios:</p>
+<ul>
+<li><strong>Regaining mutability</strong>: After preformatting, you get back a <a href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable"><code>Mutable</code></a>
+report even if the original was <a href="../markers/struct.Cloneable.html" title="struct rootcause::markers::Cloneable"><code>Cloneable</code></a>, allowing you to add more
+context or attachments to the root node.</li>
+<li><strong>Thread safety</strong>: Non-<code>Send</code>/<code>Sync</code> error types can be preformatted to
+create a <code>Send + Sync</code> report that can be transferred across thread
+boundaries.</li>
+<li><strong>Preserving formatting</strong>: The preformatted version will always display
+the same way, even if the original types or handlers are no longer
+available.</li>
+</ul>
+<h2 id="usage"><a class="doc-anchor" href="#usage">§</a>Usage</h2>
+<p>The typical usage is to call <a href="../struct.Report.html#method.preformat" title="method rootcause::Report::preformat"><code>Report::preformat</code></a> on an existing report:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>rootcause::{
+    markers::{Mutable, SendSync},
+    preformatted::PreformattedContext,
+    prelude::<span class="kw-2">*</span>,
+};
+
+<span class="kw">let </span>report: Report = <span class="macro">report!</span>(<span class="string">"database connection failed"</span>);
+<span class="kw">let </span>preformatted: Report&lt;PreformattedContext, Mutable, SendSync&gt; = report.preformat();
+
+<span class="comment">// The preformatted report displays identically to the original
+</span><span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">"{}"</span>, report), <span class="macro">format!</span>(<span class="string">"{}"</span>, preformatted));</code></pre></div><h2 id="non-sendsync-example"><a class="doc-anchor" href="#non-sendsync-example">§</a>Non-Send/Sync Example</h2>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>core::cell::Cell;
+
+<span class="kw">use </span>rootcause::{
+    markers::{Local, SendSync},
+    preformatted::PreformattedContext,
+    prelude::<span class="kw-2">*</span>,
+};
+
+<span class="comment">// Cell is !Send and !Sync
+</span><span class="attr">#[derive(Debug)]
+</span><span class="kw">struct </span>LocalError {
+    counter: Cell&lt;u32&gt;,
+}
+
+<span class="kw">impl </span>core::fmt::Display <span class="kw">for </span>LocalError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; core::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">"Local error: {}"</span>, <span class="self">self</span>.counter.get())
+    }
+}
+
+<span class="kw">let </span>local_report: Report&lt;LocalError, <span class="kw">_</span>, Local&gt; = <span class="macro">report!</span>(LocalError {
+    counter: Cell::new(<span class="number">42</span>)
+});
+
+<span class="comment">// Preformat to make it Send + Sync
+</span><span class="kw">let </span>send_sync_report: Report&lt;PreformattedContext, <span class="kw">_</span>, SendSync&gt; = local_report.preformat();
+
+<span class="comment">// Now it can be sent across threads
+// std::thread::spawn(move || { ... send_sync_report ... });</span></code></pre></div></div></details><h2 id="structs" class="section-header">Structs<a href="#structs" class="anchor">§</a></h2><dl class="item-table"><dt><a class="struct" href="struct.PreformattedAttachment.html" title="struct rootcause::preformatted::PreformattedAttachment">Preformatted<wbr>Attachment</a></dt><dd>An attachment that has been preformatted into <code>String</code>s for both
+<code>Display</code> and <code>Debug</code>.</dd><dt><a class="struct" href="struct.PreformattedContext.html" title="struct rootcause::preformatted::PreformattedContext">Preformatted<wbr>Context</a></dt><dd>A context that has been preformatted into <code>String</code>s for both
+<code>Display</code> and <code>Debug</code>.</dd></dl></section></div></main></body></html>

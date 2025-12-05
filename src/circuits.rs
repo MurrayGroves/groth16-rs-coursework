@@ -1,3 +1,5 @@
+use crate::helpers::ark_de;
+use crate::helpers::ark_se;
 use crate::polynomial::Polynomial;
 use ark_ff::FftField;
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
@@ -5,9 +7,11 @@ use log::debug;
 use rand::Rng;
 use rootcause::{Report, report};
 use serde::{Deserialize, Serialize};
-use std::cmp::max;
 use std::iter::zip;
 
+/// Represents a Rank 1 Constraint System. Should be created using `R1CS::new(...)`,
+/// which lets you provide matrices with any type that can be converted into the Scalar type.
+/// (E.g. to allow vec literals)
 #[derive(Clone, Debug)]
 pub struct R1CS<S: FftField> {
     /// Column-wise, i.e. a vec of columns
@@ -20,10 +24,12 @@ pub struct R1CS<S: FftField> {
 }
 
 impl<S: FftField> R1CS<S> {
-    pub fn new<T>(l: Vec<Vec<T>>, r: Vec<Vec<T>>, o: Vec<Vec<T>>, public_witness: Vec<T>) -> Self
+    /// Create a new R1CS from matrices in **column-major** order.
+    pub fn new<T, W>(l: Vec<Vec<T>>, r: Vec<Vec<T>>, o: Vec<Vec<T>>, public_witness: Vec<W>) -> Self
     where
-        S: From<T>,
+        S: From<T> + From<W>,
         T: Copy,
+        W: Copy,
     {
         R1CS {
             L: l.iter()
@@ -39,7 +45,7 @@ impl<S: FftField> R1CS<S> {
         }
     }
 
-    pub fn verify(&self, witness: &Vec<S>) -> Result<bool, Report> {
+    pub(crate) fn verify(&self, witness: &Vec<S>) -> Result<bool, Report> {
         let o = zip(&self.O, witness)
             .map(|(o, w)| o.iter().map(|x| *x * *w).collect::<Vec<_>>())
             .reduce(|a, b| zip(a, b).map(|(a_i, b_i)| a_i + b_i).collect())
@@ -60,6 +66,7 @@ impl<S: FftField> R1CS<S> {
     }
 }
 
+/// Represents a Quadratic Arithmetic Program. Cannot be instantiated directly, should instead be derived from a Rank 1 Constraint System using `QAP::from(r1cs)`
 #[derive(
     Debug, PartialEq, Eq, Clone, Serialize, Deserialize, CanonicalDeserialize, CanonicalSerialize,
 )]
@@ -68,11 +75,15 @@ where
     S: FftField,
 {
     /// Output
+    #[serde(serialize_with = "ark_se", deserialize_with = "ark_de")]
     pub w: Vec<Polynomial<S>>,
     /// LHS of multiplication
+    #[serde(serialize_with = "ark_se", deserialize_with = "ark_de")]
     pub u: Vec<Polynomial<S>>,
     /// RHS of multiplication
+    #[serde(serialize_with = "ark_se", deserialize_with = "ark_de")]
     pub v: Vec<Polynomial<S>>,
+    #[serde(serialize_with = "ark_se", deserialize_with = "ark_de")]
     pub public_witness: Vec<S>,
 }
 
@@ -94,7 +105,13 @@ impl<S: FftField> QAP<S> {
         .unwrap_or(0)
     }
 
-    pub fn verify(&self, witness: &Vec<S>) -> Result<bool, Report> {
+    pub(crate) fn verify(&self, witness: &Vec<S>) -> bool {
+        if witness.len() != self.u.len()
+            || witness.len() != self.v.len()
+            || witness.len() != self.w.len()
+        {
+            return false;
+        }
         let mut rng = rand::rng();
         let tau = S::from(rng.random_range(0..1000));
 
@@ -106,7 +123,7 @@ impl<S: FftField> QAP<S> {
 
         let ht = &(&a * &b) - &w;
 
-        Ok(a.evaluate(&tau) * b.evaluate(&tau) == w.evaluate(&tau) + ht.evaluate(&tau))
+        a.evaluate(&tau) * b.evaluate(&tau) == w.evaluate(&tau) + ht.evaluate(&tau)
     }
 }
 
@@ -274,7 +291,7 @@ mod tests {
         ];
 
         debug!("Matrices initialised");
-        let r1cs: R1CS<Field> = R1CS::new(l, r, o, Vec::new());
+        let r1cs: R1CS<Field> = R1CS::new(l, r, o, Vec::<i32>::new());
         let mut rng = rand::rng();
         let x = Field::from(rng.random_range(0..1000));
         let y = Field::from(rng.random_range(0..1000));

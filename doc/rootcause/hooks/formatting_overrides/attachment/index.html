@@ -1,0 +1,97 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Attachment formatting override system for customizing how error report attachments are displayed."><title>rootcause::hooks::formatting_overrides::attachment - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-e56847b5.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="rootcause" data-themes="" data-resource-suffix="" data-rustdoc-version="1.91.1 (ed61e7d7e 2025-11-07)" data-channel="1.91.1" data-search-js="search-e256b49e.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../../../static.files/storage-e2aeef58.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../../../static.files/main-6dc2a7f3.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">Module attachment</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../../rootcause/index.html">rootcause</a><span class="version">0.10.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Module attachment</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#key-components" title="Key Components">Key Components</a></li><li><a href="#example-displaying-an-attachment-with-custom-formatting" title="Example: Displaying an Attachment with Custom Formatting">Example: Displaying an Attachment with Custom Formatting</a></li><li><a href="#example-hiding-attachments" title="Example: Hiding Attachments">Example: Hiding Attachments</a></li></ul><h3><a href="#structs">Module Items</a></h3><ul class="block"><li><a href="#structs" title="Structs">Structs</a></li><li><a href="#traits" title="Traits">Traits</a></li><li><a href="#functions" title="Functions">Functions</a></li></ul></section><div id="rustdoc-modnav"><h2><a href="../index.html">In rootcause::<wbr>hooks::<wbr>formatting_<wbr>overrides</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../../../index.html">rootcause</a>::<wbr><a href="../../index.html">hooks</a>::<wbr><a href="../index.html">formatting_overrides</a></div><h1>Module <span>attachment</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../../../src/rootcause/hooks/formatting_overrides/attachment.rs.html#1-719">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Attachment formatting override system for customizing how error report
+attachments are displayed.</p>
+<p>This module provides a hook system that allows customization of how
+attachments are formatted in error reports. By registering hooks for
+specific attachment types, you can override the default Display and Debug
+formatting behavior to provide more context-aware or specialized formatting.</p>
+<h2 id="key-components"><a class="doc-anchor" href="#key-components">§</a>Key Components</h2>
+<ul>
+<li><a href="trait.AttachmentFormattingOverride.html" title="trait rootcause::hooks::formatting_overrides::attachment::AttachmentFormattingOverride"><code>AttachmentFormattingOverride</code></a> - Trait for implementing custom
+attachment formatting</li>
+<li><a href="struct.AttachmentParent.html" title="struct rootcause::hooks::formatting_overrides::attachment::AttachmentParent"><code>AttachmentParent</code></a> - Context about the report containing an attachment</li>
+<li><a href="fn.register_attachment_hook.html" title="fn rootcause::hooks::formatting_overrides::attachment::register_attachment_hook"><code>register_attachment_hook</code></a> - Function to register formatting overrides
+for specific types</li>
+<li><a href="fn.debug_attachment_hooks.html" title="fn rootcause::hooks::formatting_overrides::attachment::debug_attachment_hooks"><code>debug_attachment_hooks</code></a> - Utility to inspect registered hooks</li>
+</ul>
+<h2 id="example-displaying-an-attachment-with-custom-formatting"><a class="doc-anchor" href="#example-displaying-an-attachment-with-custom-formatting">§</a>Example: Displaying an Attachment with Custom Formatting</h2>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>core::{any::Any, fmt};
+
+<span class="kw">use </span>rootcause::{
+    handlers::{AttachmentFormattingPlacement, AttachmentFormattingStyle, FormattingFunction},
+    hooks::formatting_overrides::attachment::{
+        AttachmentFormattingOverride, AttachmentParent, register_attachment_hook,
+    },
+    report_attachment::ReportAttachmentRef,
+};
+
+<span class="kw">struct </span>ApiInformation {
+    code: u32,
+    message: String,
+}
+
+<span class="kw">struct </span>ApiInformationFormatter;
+
+<span class="kw">impl </span>AttachmentFormattingOverride&lt;ApiInformation&gt; <span class="kw">for </span>ApiInformationFormatter {
+    <span class="kw">fn </span>display(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        attachment: ReportAttachmentRef&lt;<span class="lifetime">'_</span>, ApiInformation&gt;,
+        _parent: <span class="prelude-ty">Option</span>&lt;AttachmentParent&lt;<span class="lifetime">'_</span>&gt;&gt;,
+        f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;,
+    ) -&gt; fmt::Result {
+        <span class="kw">let </span>err = attachment.inner();
+        <span class="macro">write!</span>(f, <span class="string">"API Error {}: {}"</span>, err.code, err.message)
+    }
+
+    <span class="kw">fn </span>preferred_formatting_style(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        _attachment: ReportAttachmentRef&lt;<span class="lifetime">'_</span>, <span class="kw">dyn </span>Any&gt;,
+        _report_formatting_function: FormattingFunction,
+    ) -&gt; AttachmentFormattingStyle {
+        AttachmentFormattingStyle {
+            placement: AttachmentFormattingPlacement::InlineWithHeader {
+                header: <span class="string">"API Error Details"</span>,
+            },
+            function: FormattingFunction::Display,
+            priority: <span class="number">100</span>, <span class="comment">// High priority for API errors
+        </span>}
+    }
+}
+
+<span class="comment">// Register the custom formatter
+</span>register_attachment_hook(ApiInformationFormatter);</code></pre></div><h2 id="example-hiding-attachments"><a class="doc-anchor" href="#example-hiding-attachments">§</a>Example: Hiding Attachments</h2>
+<p>You can also use formatting overrides to conditionally hide attachments by
+setting their placement to <code>Hidden</code>:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>core::any::Any;
+
+<span class="kw">use </span>rootcause::{
+    handlers::{AttachmentFormattingPlacement, AttachmentFormattingStyle, FormattingFunction},
+    hooks::formatting_overrides::attachment::{
+        AttachmentFormattingOverride, register_attachment_hook,
+    },
+    report_attachment::ReportAttachmentRef,
+};
+
+<span class="kw">struct </span>SensitiveData(String);
+
+<span class="kw">struct </span>SilenceAttachmentHook;
+
+<span class="kw">impl</span>&lt;A: <span class="lifetime">'static</span>&gt; AttachmentFormattingOverride&lt;A&gt; <span class="kw">for </span>SilenceAttachmentHook {
+    <span class="kw">fn </span>preferred_formatting_style(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        _attachment: ReportAttachmentRef&lt;<span class="lifetime">'_</span>, <span class="kw">dyn </span>Any&gt;,
+        _report_formatting_function: FormattingFunction,
+    ) -&gt; AttachmentFormattingStyle {
+        AttachmentFormattingStyle {
+            placement: AttachmentFormattingPlacement::Hidden,
+            function: FormattingFunction::Display,
+            priority: <span class="number">0</span>,
+        }
+    }
+}
+
+<span class="comment">// Register the silencing hook to suppress sensitive data in error reports
+</span>register_attachment_hook::&lt;SensitiveData, <span class="kw">_</span>&gt;(SilenceAttachmentHook);</code></pre></div></div></details><h2 id="structs" class="section-header">Structs<a href="#structs" class="anchor">§</a></h2><dl class="item-table"><dt><a class="struct" href="struct.AttachmentParent.html" title="struct rootcause::hooks::formatting_overrides::attachment::AttachmentParent">Attachment<wbr>Parent</a></dt><dd>Information about the parent report that contains an attachment being
+formatted.</dd></dl><h2 id="traits" class="section-header">Traits<a href="#traits" class="anchor">§</a></h2><dl class="item-table"><dt><a class="trait" href="trait.AttachmentFormattingOverride.html" title="trait rootcause::hooks::formatting_overrides::attachment::AttachmentFormattingOverride">Attachment<wbr>Formatting<wbr>Override</a></dt><dd>Trait for customizing how attachments of a specific type are formatted in
+error reports.</dd></dl><h2 id="functions" class="section-header">Functions<a href="#functions" class="anchor">§</a></h2><dl class="item-table"><dt><a class="fn" href="fn.debug_attachment_hooks.html" title="fn rootcause::hooks::formatting_overrides::attachment::debug_attachment_hooks">debug_<wbr>attachment_<wbr>hooks</a></dt><dd>Calls a function for each registered attachment formatting hook for
+debugging purposes.</dd><dt><a class="fn" href="fn.register_attachment_hook.html" title="fn rootcause::hooks::formatting_overrides::attachment::register_attachment_hook">register_<wbr>attachment_<wbr>hook</a></dt><dd>Registers a formatting override hook for attachments of type <code>A</code>.</dd></dl></section></div></main></body></html>

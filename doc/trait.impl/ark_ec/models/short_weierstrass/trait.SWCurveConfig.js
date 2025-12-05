@@ -1,0 +1,9 @@
+(function() {
+    var implementors = Object.fromEntries([["ark_mnt6_753",[["impl <a class=\"trait\" href=\"ark_ec/models/short_weierstrass/trait.SWCurveConfig.html\" title=\"trait ark_ec::models::short_weierstrass::SWCurveConfig\">SWCurveConfig</a> for <a class=\"struct\" href=\"ark_mnt6_753/g1/struct.Config.html\" title=\"struct ark_mnt6_753::g1::Config\">Config</a>"],["impl <a class=\"trait\" href=\"ark_ec/models/short_weierstrass/trait.SWCurveConfig.html\" title=\"trait ark_ec::models::short_weierstrass::SWCurveConfig\">SWCurveConfig</a> for <a class=\"struct\" href=\"ark_mnt6_753/g2/struct.Config.html\" title=\"struct ark_mnt6_753::g2::Config\">Config</a>"]]]]);
+    if (window.register_implementors) {
+        window.register_implementors(implementors);
+    } else {
+        window.pending_implementors = implementors;
+    }
+})()
+//{"start":57,"fragment_lengths":[614]}

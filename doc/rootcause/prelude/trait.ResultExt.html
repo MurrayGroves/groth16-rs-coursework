@@ -1,0 +1,759 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Extension trait for `Result` that provides error handling and reporting functionality."><title>ResultExt in rootcause::prelude - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-e56847b5.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rootcause" data-themes="" data-resource-suffix="" data-rustdoc-version="1.91.1 (ed61e7d7e 2025-11-07)" data-channel="1.91.1" data-search-js="search-e256b49e.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../static.files/storage-e2aeef58.js"></script><script defer src="sidebar-items.js"></script><script defer src="../../static.files/main-6dc2a7f3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc trait"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">ResultExt</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../rootcause/index.html">rootcause</a><span class="version">0.10.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Result<wbr>Ext</a></h2><h3><a href="#required-methods">Required Methods</a></h3><ul class="block"><li><a href="#tymethod.attach" title="attach">attach</a></li><li><a href="#tymethod.attach_custom" title="attach_custom">attach_custom</a></li><li><a href="#tymethod.attach_custom_with" title="attach_custom_with">attach_custom_with</a></li><li><a href="#tymethod.attach_with" title="attach_with">attach_with</a></li><li><a href="#tymethod.context" title="context">context</a></li><li><a href="#tymethod.context_custom" title="context_custom">context_custom</a></li><li><a href="#tymethod.context_custom_with" title="context_custom_with">context_custom_with</a></li><li><a href="#tymethod.context_with" title="context_with">context_with</a></li><li><a href="#tymethod.into_report" title="into_report">into_report</a></li><li><a href="#tymethod.local_attach" title="local_attach">local_attach</a></li><li><a href="#tymethod.local_attach_custom" title="local_attach_custom">local_attach_custom</a></li><li><a href="#tymethod.local_attach_custom_with" title="local_attach_custom_with">local_attach_custom_with</a></li><li><a href="#tymethod.local_attach_with" title="local_attach_with">local_attach_with</a></li><li><a href="#tymethod.local_context" title="local_context">local_context</a></li><li><a href="#tymethod.local_context_custom" title="local_context_custom">local_context_custom</a></li><li><a href="#tymethod.local_context_custom_with" title="local_context_custom_with">local_context_custom_with</a></li><li><a href="#tymethod.local_context_with" title="local_context_with">local_context_with</a></li><li><a href="#tymethod.local_into_report" title="local_into_report">local_into_report</a></li></ul><h3><a href="#foreign-impls">Implementations on Foreign Types</a></h3><ul class="block"><li><a href="#impl-ResultExt%3CV,+E%3E-for-Result%3CV,+E%3E" title="Result&#60;V, E&#62;">Result&#60;V, E&#62;</a></li></ul><h3><a href="#dyn-compatibility">Dyn Compatibility</a></h3><h3><a href="#implementors">Implementors</a></h3></section><div id="rustdoc-modnav"><h2><a href="index.html">In rootcause::<wbr>prelude</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../index.html">rootcause</a>::<wbr><a href="index.html">prelude</a></div><h1>Trait <span class="trait">Result<wbr>Ext</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../src/rootcause/result_ext.rs.html#34-766">Source</a> </span></div><pre class="rust item-decl"><code>pub trait ResultExt&lt;V, E&gt;: Sealed {
+<details class="toggle type-contents-toggle"><summary class="hideme"><span>Show 18 methods</span></summary>    // Required methods
+    fn <a href="#tymethod.into_report" class="fn">into_report</a>(
+        self,
+    ) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Ownership" title="type rootcause::IntoReport::Ownership">Ownership</a>, <a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;&gt;
+       <span class="where">where E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;</span>;
+<span class="item-spacer"></span>    fn <a href="#tymethod.context" class="fn">context</a>&lt;C&gt;(self, context: C) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;C, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;&gt;
+       <span class="where">where E: <a class="trait" href="../trait.IntoReportCollection.html" title="trait rootcause::IntoReportCollection">IntoReportCollection</a>&lt;<a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;,
+             C: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Display.html" title="trait core::fmt::Display">Display</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a></span>;
+<span class="item-spacer"></span>    fn <a href="#tymethod.context_with" class="fn">context_with</a>&lt;C, F&gt;(
+        self,
+        context: F,
+    ) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;C, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;&gt;
+       <span class="where">where E: <a class="trait" href="../trait.IntoReportCollection.html" title="trait rootcause::IntoReportCollection">IntoReportCollection</a>&lt;<a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;,
+             F: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>() -&gt; C,
+             C: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Display.html" title="trait core::fmt::Display">Display</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a></span>;
+<span class="item-spacer"></span>    fn <a href="#tymethod.context_custom" class="fn">context_custom</a>&lt;H, C&gt;(
+        self,
+        context: C,
+    ) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;C, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;&gt;
+       <span class="where">where E: <a class="trait" href="../trait.IntoReportCollection.html" title="trait rootcause::IntoReportCollection">IntoReportCollection</a>&lt;<a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;,
+             C: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a>,
+             H: <a class="trait" href="../handlers/trait.ContextHandler.html" title="trait rootcause::handlers::ContextHandler">ContextHandler</a>&lt;C&gt;</span>;
+<span class="item-spacer"></span>    fn <a href="#tymethod.context_custom_with" class="fn">context_custom_with</a>&lt;H, C, F&gt;(
+        self,
+        context: F,
+    ) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;C, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;&gt;
+       <span class="where">where E: <a class="trait" href="../trait.IntoReportCollection.html" title="trait rootcause::IntoReportCollection">IntoReportCollection</a>&lt;<a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;,
+             F: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>() -&gt; C,
+             C: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a>,
+             H: <a class="trait" href="../handlers/trait.ContextHandler.html" title="trait rootcause::handlers::ContextHandler">ContextHandler</a>&lt;C&gt;</span>;
+<span class="item-spacer"></span>    fn <a href="#tymethod.attach" class="fn">attach</a>&lt;A&gt;(
+        self,
+        attachment: A,
+    ) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;&gt;
+       <span class="where">where E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>, Ownership = <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>&gt;,
+             A: 'static + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Display.html" title="trait core::fmt::Display">Display</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a></span>;
+<span class="item-spacer"></span>    fn <a href="#tymethod.attach_with" class="fn">attach_with</a>&lt;A, F&gt;(
+        self,
+        attachment: F,
+    ) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;&gt;
+       <span class="where">where E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>, Ownership = <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>&gt;,
+             F: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>() -&gt; A,
+             A: 'static + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Display.html" title="trait core::fmt::Display">Display</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a></span>;
+<span class="item-spacer"></span>    fn <a href="#tymethod.attach_custom" class="fn">attach_custom</a>&lt;H, A&gt;(
+        self,
+        attachment: A,
+    ) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;&gt;
+       <span class="where">where E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>, Ownership = <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>&gt;,
+             A: 'static + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a>,
+             H: <a class="trait" href="../handlers/trait.AttachmentHandler.html" title="trait rootcause::handlers::AttachmentHandler">AttachmentHandler</a>&lt;A&gt;</span>;
+<span class="item-spacer"></span>    fn <a href="#tymethod.attach_custom_with" class="fn">attach_custom_with</a>&lt;H, A, F&gt;(
+        self,
+        attachment: F,
+    ) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;&gt;
+       <span class="where">where E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>, Ownership = <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>&gt;,
+             F: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>() -&gt; A,
+             A: 'static + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a>,
+             H: <a class="trait" href="../handlers/trait.AttachmentHandler.html" title="trait rootcause::handlers::AttachmentHandler">AttachmentHandler</a>&lt;A&gt;</span>;
+<span class="item-spacer"></span>    fn <a href="#tymethod.local_into_report" class="fn">local_into_report</a>(
+        self,
+    ) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Ownership" title="type rootcause::IntoReport::Ownership">Ownership</a>, <a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;&gt;
+       <span class="where">where E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;</span>;
+<span class="item-spacer"></span>    fn <a href="#tymethod.local_context" class="fn">local_context</a>&lt;C&gt;(
+        self,
+        context: C,
+    ) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;C, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;&gt;
+       <span class="where">where E: <a class="trait" href="../trait.IntoReportCollection.html" title="trait rootcause::IntoReportCollection">IntoReportCollection</a>&lt;<a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;,
+             C: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Display.html" title="trait core::fmt::Display">Display</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a></span>;
+<span class="item-spacer"></span>    fn <a href="#tymethod.local_context_with" class="fn">local_context_with</a>&lt;C, F&gt;(
+        self,
+        context: F,
+    ) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;C, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;&gt;
+       <span class="where">where E: <a class="trait" href="../trait.IntoReportCollection.html" title="trait rootcause::IntoReportCollection">IntoReportCollection</a>&lt;<a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;,
+             F: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>() -&gt; C,
+             C: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Display.html" title="trait core::fmt::Display">Display</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a></span>;
+<span class="item-spacer"></span>    fn <a href="#tymethod.local_context_custom" class="fn">local_context_custom</a>&lt;H, C&gt;(
+        self,
+        context: C,
+    ) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;C, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;&gt;
+       <span class="where">where E: <a class="trait" href="../trait.IntoReportCollection.html" title="trait rootcause::IntoReportCollection">IntoReportCollection</a>&lt;<a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;,
+             H: <a class="trait" href="../handlers/trait.ContextHandler.html" title="trait rootcause::handlers::ContextHandler">ContextHandler</a>&lt;C&gt;</span>;
+<span class="item-spacer"></span>    fn <a href="#tymethod.local_context_custom_with" class="fn">local_context_custom_with</a>&lt;H, C, F&gt;(
+        self,
+        context: F,
+    ) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;C, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;&gt;
+       <span class="where">where E: <a class="trait" href="../trait.IntoReportCollection.html" title="trait rootcause::IntoReportCollection">IntoReportCollection</a>&lt;<a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;,
+             F: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>() -&gt; C,
+             H: <a class="trait" href="../handlers/trait.ContextHandler.html" title="trait rootcause::handlers::ContextHandler">ContextHandler</a>&lt;C&gt;</span>;
+<span class="item-spacer"></span>    fn <a href="#tymethod.local_attach" class="fn">local_attach</a>&lt;A&gt;(
+        self,
+        attachment: A,
+    ) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;&gt;
+       <span class="where">where E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>, Ownership = <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>&gt;,
+             A: 'static + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Display.html" title="trait core::fmt::Display">Display</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a></span>;
+<span class="item-spacer"></span>    fn <a href="#tymethod.local_attach_with" class="fn">local_attach_with</a>&lt;A, F&gt;(
+        self,
+        attachment: F,
+    ) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;&gt;
+       <span class="where">where E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>, Ownership = <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>&gt;,
+             F: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>() -&gt; A,
+             A: 'static + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Display.html" title="trait core::fmt::Display">Display</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a></span>;
+<span class="item-spacer"></span>    fn <a href="#tymethod.local_attach_custom" class="fn">local_attach_custom</a>&lt;H, A&gt;(
+        self,
+        attachment: A,
+    ) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;&gt;
+       <span class="where">where A: 'static,
+             E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>, Ownership = <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>&gt;,
+             H: <a class="trait" href="../handlers/trait.AttachmentHandler.html" title="trait rootcause::handlers::AttachmentHandler">AttachmentHandler</a>&lt;A&gt;</span>;
+<span class="item-spacer"></span>    fn <a href="#tymethod.local_attach_custom_with" class="fn">local_attach_custom_with</a>&lt;H, A, F&gt;(
+        self,
+        attachment: F,
+    ) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;&gt;
+       <span class="where">where A: 'static,
+             E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>, Ownership = <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>&gt;,
+             F: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>() -&gt; A,
+             H: <a class="trait" href="../handlers/trait.AttachmentHandler.html" title="trait rootcause::handlers::AttachmentHandler">AttachmentHandler</a>&lt;A&gt;</span>;
+</details>}</code></pre><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Extension trait for <code>Result</code> that provides error handling and reporting
+functionality.</p>
+<p>This trait adds methods to <code>Result</code> types that allow you to convert errors
+into <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>s with additional context and attachments. It provides both
+thread-safe (<code>Send + Sync</code>) and local-only variants of each method.</p>
+<p>The methods in this trait fall into several categories:</p>
+<ul>
+<li><strong>Converting to reports</strong>: <a href="trait.ResultExt.html#tymethod.into_report" title="method rootcause::prelude::ResultExt::into_report"><code>into_report</code></a>
+converts the error into a <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a></li>
+<li><strong>Adding context</strong>: <a href="trait.ResultExt.html#tymethod.context" title="method rootcause::prelude::ResultExt::context"><code>context</code></a>,
+<a href="trait.ResultExt.html#tymethod.context_with" title="method rootcause::prelude::ResultExt::context_with"><code>context_with</code></a>, and variants add a new context
+layer to the error</li>
+<li><strong>Adding attachments</strong>: <a href="trait.ResultExt.html#tymethod.attach" title="method rootcause::prelude::ResultExt::attach"><code>attach</code></a>,
+<a href="trait.ResultExt.html#tymethod.attach_with" title="method rootcause::prelude::ResultExt::attach_with"><code>attach_with</code></a>, and variants add supplementary
+data to the error</li>
+</ul>
+<p>Each method has a <code>local_*</code> variant for working with types that are not
+<code>Send + Sync</code>.</p>
+</div></details><h2 id="required-methods" class="section-header">Required Methods<a href="#required-methods" class="anchor">§</a></h2><div class="methods"><details class="toggle method-toggle" open><summary><section id="tymethod.into_report" class="method"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#58-60">Source</a><h4 class="code-header">fn <a href="#tymethod.into_report" class="fn">into_report</a>(self) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Ownership" title="type rootcause::IntoReport::Ownership">Ownership</a>, <a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;,</div></h4></section></summary><div class="docblock"><p>Converts the error into a <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</p>
+<p>If the result is <code>Ok</code>, returns the value unchanged. If the result is
+<code>Err</code>, converts the error into a <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</p>
+<p>See also <a href="trait.ResultExt.html#tymethod.local_into_report" title="method rootcause::prelude::ResultExt::local_into_report"><code>local_into_report</code></a> for a
+non-thread-safe version that works with types that are not
+<code>Send + Sync</code>.</p>
+<h5 id="examples"><a class="doc-anchor" href="#examples">§</a>Examples</h5>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::io;
+
+<span class="kw">use </span>rootcause::prelude::<span class="kw-2">*</span>;
+
+<span class="kw">fn </span>read_config() -&gt; <span class="prelude-ty">Result</span>&lt;String, io::Error&gt; {
+    std::fs::read_to_string(<span class="string">"config.toml"</span>)
+}
+
+<span class="kw">let </span>result: <span class="prelude-ty">Result</span>&lt;String, Report&lt;io::Error&gt;&gt; = read_config().into_report();</code></pre></div></div></details><details class="toggle method-toggle" open><summary><section id="tymethod.context" class="method"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#95-98">Source</a><h4 class="code-header">fn <a href="#tymethod.context" class="fn">context</a>&lt;C&gt;(self, context: C) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;C, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReportCollection.html" title="trait rootcause::IntoReportCollection">IntoReportCollection</a>&lt;<a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;,
+    C: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Display.html" title="trait core::fmt::Display">Display</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a>,</div></h4></section></summary><div class="docblock"><p>Converts the error into a new <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> using the provided context. The
+current error is set as a child of the new <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</p>
+<p>If the result is <code>Ok</code>, returns the value unchanged. If the result is
+<code>Err</code>, converts the error into a report collection and adds the
+provided context. The context becomes the primary error message,
+with the original error becoming part of the error chain.</p>
+<p>This method also works when the original error is a
+<a href="../report_collection/struct.ReportCollection.html" title="struct rootcause::report_collection::ReportCollection"><code>ReportCollection</code></a>, in which case all errors in that collection
+are set as children of the new <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</p>
+<p>See also <a href="trait.ResultExt.html#tymethod.local_context" title="method rootcause::prelude::ResultExt::local_context"><code>local_context</code></a> for a
+non-thread-safe version that works with types that are not
+<code>Send + Sync</code>.</p>
+<h5 id="examples-1"><a class="doc-anchor" href="#examples-1">§</a>Examples</h5>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::io;
+
+<span class="kw">use </span>rootcause::prelude::<span class="kw-2">*</span>;
+
+<span class="kw">fn </span>fetch_data(path: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, io::Error&gt; {
+    std::fs::read(path)
+}
+
+<span class="kw">let </span>result: <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, Report&lt;<span class="kw-2">&amp;</span>str&gt;&gt; =
+    fetch_data(<span class="string">"user_data.bz2"</span>).context(<span class="string">"Failed to fetch user data"</span>);</code></pre></div></div></details><details class="toggle method-toggle" open><summary><section id="tymethod.context_with" class="method"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#134-138">Source</a><h4 class="code-header">fn <a href="#tymethod.context_with" class="fn">context_with</a>&lt;C, F&gt;(
+    self,
+    context: F,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;C, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReportCollection.html" title="trait rootcause::IntoReportCollection">IntoReportCollection</a>&lt;<a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;,
+    F: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>() -&gt; C,
+    C: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Display.html" title="trait core::fmt::Display">Display</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a>,</div></h4></section></summary><div class="docblock"><p>Converts the error into a new <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> using context generated by the
+provided closure. The current error is set as a child of the new
+<a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</p>
+<p>This is similar to <a href="trait.ResultExt.html#tymethod.context" title="method rootcause::prelude::ResultExt::context"><code>context</code></a>, but the context is
+computed lazily using a closure. This can be useful when computing
+the context is expensive, as the closure will only be called if an
+error actually occurs.</p>
+<p>This method also works when the original error is a
+<a href="../report_collection/struct.ReportCollection.html" title="struct rootcause::report_collection::ReportCollection"><code>ReportCollection</code></a>, in which case all errors in that collection
+are set as children of the new <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</p>
+<p>See also <a href="trait.ResultExt.html#tymethod.local_context_with" title="method rootcause::prelude::ResultExt::local_context_with"><code>local_context_with</code></a> for a
+non-thread-safe version that works with types that are not
+<code>Send + Sync</code>.</p>
+<h5 id="examples-2"><a class="doc-anchor" href="#examples-2">§</a>Examples</h5>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::io;
+
+<span class="kw">use </span>rootcause::prelude::<span class="kw-2">*</span>;
+
+<span class="kw">fn </span>get_timestamp() -&gt; String {
+    <span class="string">"12:34:56"</span>.to_string()
+}
+
+<span class="kw">let </span>result: <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, Report&lt;String&gt;&gt; =
+    std::fs::read(<span class="string">"user_data.bz2"</span>).context_with(|| <span class="macro">format!</span>(<span class="string">"Failed at {}"</span>, get_timestamp()));</code></pre></div></div></details><details class="toggle method-toggle" open><summary><section id="tymethod.context_custom" class="method"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#175-179">Source</a><h4 class="code-header">fn <a href="#tymethod.context_custom" class="fn">context_custom</a>&lt;H, C&gt;(
+    self,
+    context: C,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;C, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReportCollection.html" title="trait rootcause::IntoReportCollection">IntoReportCollection</a>&lt;<a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;,
+    C: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a>,
+    H: <a class="trait" href="../handlers/trait.ContextHandler.html" title="trait rootcause::handlers::ContextHandler">ContextHandler</a>&lt;C&gt;,</div></h4></section></summary><div class="docblock"><p>Converts the error into a new <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> using the provided context.
+The current error is set as a child of the new <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</p>
+<p>This is similar to <a href="trait.ResultExt.html#tymethod.context" title="method rootcause::prelude::ResultExt::context"><code>context</code></a>, but uses a custom
+<a href="../handlers/trait.ContextHandler.html" title="trait rootcause::handlers::ContextHandler"><code>ContextHandler</code></a> to control how the context is formatted and
+displayed.</p>
+<p>This method also works when the original error is a
+<a href="../report_collection/struct.ReportCollection.html" title="struct rootcause::report_collection::ReportCollection"><code>ReportCollection</code></a>, in which case all errors in that collection
+are set as children of the new <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</p>
+<p>See also <a href="trait.ResultExt.html#tymethod.local_context_custom" title="method rootcause::prelude::ResultExt::local_context_custom"><code>local_context_custom</code></a> for a
+non-thread-safe version that works with types that are not
+<code>Send + Sync</code>.</p>
+<h5 id="examples-3"><a class="doc-anchor" href="#examples-3">§</a>Examples</h5>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::io;
+
+<span class="kw">use </span>rootcause::prelude::<span class="kw-2">*</span>;
+
+<span class="attr">#[derive(Debug)]
+</span><span class="kw">enum </span>ErrorContext {
+    DeserializationError,
+    IoError,
+}
+
+<span class="kw">let </span>result: <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, Report&lt;ErrorContext&gt;&gt; =
+    std::fs::read(<span class="string">"user_data.bz2"</span>).context_custom::&lt;handlers::Debug, <span class="kw">_</span>&gt;(ErrorContext::IoError);</code></pre></div></div></details><details class="toggle method-toggle" open><summary><section id="tymethod.context_custom_with" class="method"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#224-229">Source</a><h4 class="code-header">fn <a href="#tymethod.context_custom_with" class="fn">context_custom_with</a>&lt;H, C, F&gt;(
+    self,
+    context: F,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;C, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReportCollection.html" title="trait rootcause::IntoReportCollection">IntoReportCollection</a>&lt;<a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;,
+    F: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>() -&gt; C,
+    C: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a>,
+    H: <a class="trait" href="../handlers/trait.ContextHandler.html" title="trait rootcause::handlers::ContextHandler">ContextHandler</a>&lt;C&gt;,</div></h4></section></summary><div class="docblock"><p>Converts the error into a new <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> using context generated by the
+provided closure. The current error is set as a child of the new
+<a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</p>
+<p>Combines the lazy evaluation of
+<a href="trait.ResultExt.html#tymethod.context_with" title="method rootcause::prelude::ResultExt::context_with"><code>context_with</code></a> with the custom
+handler capabilities of <a href="trait.ResultExt.html#tymethod.context_custom" title="method rootcause::prelude::ResultExt::context_custom"><code>context_custom</code></a>.</p>
+<p>This method also works when the original error is a
+<a href="../report_collection/struct.ReportCollection.html" title="struct rootcause::report_collection::ReportCollection"><code>ReportCollection</code></a>, in which case all errors in that collection
+are set as children of the new <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</p>
+<p>See also <a href="trait.ResultExt.html#tymethod.local_context_custom_with" title="method rootcause::prelude::ResultExt::local_context_custom_with"><code>local_context_custom_with</code></a>
+for a non-thread-safe version that works with types that are not
+<code>Send + Sync</code>.</p>
+<h5 id="examples-4"><a class="doc-anchor" href="#examples-4">§</a>Examples</h5>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::io;
+
+<span class="kw">use </span>rootcause::prelude::<span class="kw-2">*</span>;
+
+<span class="attr">#[derive(Debug)]
+</span><span class="kw">struct </span>ErrorContext {
+    timestamp: String,
+    operation: String,
+}
+
+<span class="kw">fn </span>expensive_computation() -&gt; ErrorContext {
+    ErrorContext {
+        timestamp: <span class="string">"12:34:56"</span>.to_string(),
+        operation: <span class="string">"file_read"</span>.to_string(),
+    }
+}
+
+<span class="kw">let </span>result: <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, Report&lt;ErrorContext&gt;&gt; =
+    std::fs::read(<span class="string">"user_data.bz2"</span>)
+        .context_custom_with::&lt;handlers::Debug, <span class="kw">_</span>, <span class="kw">_</span>&gt;(expensive_computation);</code></pre></div></div></details><details class="toggle method-toggle" open><summary><section id="tymethod.attach" class="method"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#253-256">Source</a><h4 class="code-header">fn <a href="#tymethod.attach" class="fn">attach</a>&lt;A&gt;(
+    self,
+    attachment: A,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>, Ownership = <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>&gt;,
+    A: 'static + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Display.html" title="trait core::fmt::Display">Display</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a>,</div></h4></section></summary><div class="docblock"><p>Converts the error into a <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> and adds the provided attachment to
+the <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</p>
+<p>If the result is <code>Ok</code>, returns the value unchanged. If the result is
+<code>Err</code>, converts the error into a <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> and attaches the
+provided data as an attachment. Attachments provide additional
+context without changing the primary error message.</p>
+<p>See also <a href="trait.ResultExt.html#tymethod.local_attach" title="method rootcause::prelude::ResultExt::local_attach"><code>local_attach</code></a> for a non-thread-safe
+version that works with types that are not <code>Send + Sync</code>.</p>
+<h5 id="examples-5"><a class="doc-anchor" href="#examples-5">§</a>Examples</h5>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::io;
+
+<span class="kw">use </span>rootcause::prelude::<span class="kw-2">*</span>;
+
+<span class="kw">let </span>result: <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, Report&lt;io::Error&gt;&gt; =
+    std::fs::read(<span class="string">"user_data.bz2"</span>).attach(<span class="string">"while reading user_data.bz2"</span>);</code></pre></div></div></details><details class="toggle method-toggle" open><summary><section id="tymethod.attach_with" class="method"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#285-289">Source</a><h4 class="code-header">fn <a href="#tymethod.attach_with" class="fn">attach_with</a>&lt;A, F&gt;(
+    self,
+    attachment: F,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>, Ownership = <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>&gt;,
+    F: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>() -&gt; A,
+    A: 'static + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Display.html" title="trait core::fmt::Display">Display</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a>,</div></h4></section></summary><div class="docblock"><p>Converts the error into a <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> and adds an attachment generated by
+the provided closure to the <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</p>
+<p>This is similar to <a href="trait.ResultExt.html#tymethod.attach" title="method rootcause::prelude::ResultExt::attach"><code>attach</code></a>, but the attachment is
+computed lazily using a closure. This can be useful when computing
+the attachment is expensive, as the closure will only be called if
+an error actually occurs.</p>
+<p>See also <a href="trait.ResultExt.html#tymethod.local_attach_with" title="method rootcause::prelude::ResultExt::local_attach_with"><code>local_attach_with</code></a> for a
+non-thread-safe version that works with types that are not
+<code>Send + Sync</code>.</p>
+<h5 id="examples-6"><a class="doc-anchor" href="#examples-6">§</a>Examples</h5>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::io;
+
+<span class="kw">use </span>rootcause::prelude::<span class="kw-2">*</span>;
+
+<span class="kw">fn </span>get_debug_info() -&gt; String {
+    <span class="string">"complex computation result"</span>.to_string()
+}
+
+<span class="kw">let </span>result: <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, Report&lt;io::Error&gt;&gt; =
+    std::fs::read(<span class="string">"user_data.bz2"</span>).attach_with(|| <span class="macro">format!</span>(<span class="string">"debug info: {}"</span>, get_debug_info()));</code></pre></div></div></details><details class="toggle method-toggle" open><summary><section id="tymethod.attach_custom" class="method"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#326-330">Source</a><h4 class="code-header">fn <a href="#tymethod.attach_custom" class="fn">attach_custom</a>&lt;H, A&gt;(
+    self,
+    attachment: A,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>, Ownership = <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>&gt;,
+    A: 'static + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a>,
+    H: <a class="trait" href="../handlers/trait.AttachmentHandler.html" title="trait rootcause::handlers::AttachmentHandler">AttachmentHandler</a>&lt;A&gt;,</div></h4></section></summary><div class="docblock"><p>Converts the error into a <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> and adds the provided attachment to
+the <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</p>
+<p>This is similar to <a href="trait.ResultExt.html#tymethod.attach" title="method rootcause::prelude::ResultExt::attach"><code>attach</code></a>, but uses a custom
+<a href="../handlers/trait.AttachmentHandler.html" title="trait rootcause::handlers::AttachmentHandler"><code>AttachmentHandler</code></a> to control how the attachment is formatted and
+displayed.</p>
+<p>See also <a href="trait.ResultExt.html#tymethod.local_attach_custom" title="method rootcause::prelude::ResultExt::local_attach_custom"><code>local_attach_custom</code></a> for a
+non-thread-safe version that works with types that are not
+<code>Send + Sync</code>.</p>
+<h5 id="examples-7"><a class="doc-anchor" href="#examples-7">§</a>Examples</h5>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::io;
+
+<span class="kw">use </span>rootcause::prelude::<span class="kw-2">*</span>;
+
+<span class="attr">#[derive(Debug)]
+</span><span class="kw">struct </span>RequestMetadata {
+    request_id: u64,
+    user_id: u64,
+}
+
+<span class="kw">let </span>metadata = RequestMetadata {
+    request_id: <span class="number">12345</span>,
+    user_id: <span class="number">67890</span>,
+};
+
+<span class="kw">let </span>result: <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, Report&lt;io::Error&gt;&gt; =
+    std::fs::read(<span class="string">"user_data.bz2"</span>).attach_custom::&lt;handlers::Debug, <span class="kw">_</span>&gt;(metadata);</code></pre></div></div></details><details class="toggle method-toggle" open><summary><section id="tymethod.attach_custom_with" class="method"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#367-375">Source</a><h4 class="code-header">fn <a href="#tymethod.attach_custom_with" class="fn">attach_custom_with</a>&lt;H, A, F&gt;(
+    self,
+    attachment: F,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>, Ownership = <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>&gt;,
+    F: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>() -&gt; A,
+    A: 'static + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a>,
+    H: <a class="trait" href="../handlers/trait.AttachmentHandler.html" title="trait rootcause::handlers::AttachmentHandler">AttachmentHandler</a>&lt;A&gt;,</div></h4></section></summary><div class="docblock"><p>Converts the error into a <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> and adds an attachment generated by
+the provided closure to the <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</p>
+<p>Combines the lazy evaluation of <a href="trait.ResultExt.html#tymethod.attach_with" title="method rootcause::prelude::ResultExt::attach_with"><code>attach_with</code></a>
+with the custom handler capabilities of
+<a href="trait.ResultExt.html#tymethod.attach_custom" title="method rootcause::prelude::ResultExt::attach_custom"><code>attach_custom</code></a>.</p>
+<p>See also <a href="trait.ResultExt.html#tymethod.local_attach_custom_with" title="method rootcause::prelude::ResultExt::local_attach_custom_with"><code>local_attach_custom_with</code></a>
+for a non-thread-safe version that works with types that are not
+<code>Send + Sync</code>.</p>
+<h5 id="examples-8"><a class="doc-anchor" href="#examples-8">§</a>Examples</h5>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::io;
+
+<span class="kw">use </span>rootcause::prelude::<span class="kw-2">*</span>;
+
+<span class="attr">#[derive(Debug)]
+</span><span class="kw">struct </span>RequestMetadata {
+    request_id: u64,
+    timestamp: String,
+}
+
+<span class="kw">fn </span>expensive_computation() -&gt; RequestMetadata {
+    RequestMetadata {
+        request_id: <span class="number">12345</span>,
+        timestamp: <span class="string">"12:34:56"</span>.to_string(),
+    }
+}
+
+<span class="kw">let </span>result: <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, Report&lt;io::Error&gt;&gt; = std::fs::read(<span class="string">"user_data.bz2"</span>)
+    .attach_custom_with::&lt;handlers::Debug, <span class="kw">_</span>, <span class="kw">_</span>&gt;(expensive_computation);</code></pre></div></div></details><details class="toggle method-toggle" open><summary><section id="tymethod.local_into_report" class="method"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#417-419">Source</a><h4 class="code-header">fn <a href="#tymethod.local_into_report" class="fn">local_into_report</a>(self) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Ownership" title="type rootcause::IntoReport::Ownership">Ownership</a>, <a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;,</div></h4></section></summary><div class="docblock"><p>Converts the error into a local (non-thread-safe) <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</p>
+<p>If the result is <code>Ok</code>, returns the value unchanged. If the result is
+<code>Err</code>, converts the error into a <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> that can contain types
+that are not <code>Send + Sync</code>.</p>
+<p>This allows you to use rootcause with error types that contain
+thread-local data like <a href="https://doc.rust-lang.org/1.91.1/alloc/rc/struct.Rc.html" title="struct alloc::rc::Rc"><code>Rc</code></a> or other <code>!Send</code> types.</p>
+<p>See also <a href="trait.ResultExt.html#tymethod.into_report" title="method rootcause::prelude::ResultExt::into_report"><code>into_report</code></a> for a thread-safe
+version that returns a <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> that can be sent across thread
+boundaries.</p>
+<h5 id="examples-9"><a class="doc-anchor" href="#examples-9">§</a>Examples</h5>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::{fmt, rc::Rc};
+
+<span class="kw">use </span>rootcause::prelude::<span class="kw-2">*</span>;
+
+<span class="comment">// This error is neither Send nor Sync
+</span><span class="attr">#[derive(Debug)]
+</span><span class="kw">struct </span>MyError(Rc&lt;String&gt;);
+
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>MyError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">"{}"</span>, <span class="self">self</span>.<span class="number">0</span>)
+    }
+}
+
+<span class="kw">impl </span>std::error::Error <span class="kw">for </span>MyError {}
+
+<span class="kw">fn </span>some_function() -&gt; <span class="prelude-ty">Result</span>&lt;String, MyError&gt; {
+    <span class="prelude-val">Err</span>(MyError(Rc::new(<span class="string">"error"</span>.to_string())))
+}
+
+<span class="kw">let </span>result: <span class="prelude-ty">Result</span>&lt;String, Report&lt;MyError, <span class="kw">_</span>, markers::Local&gt;&gt; =
+    some_function().local_into_report();</code></pre></div></div></details><details class="toggle method-toggle" open><summary><section id="tymethod.local_context" class="method"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#454-457">Source</a><h4 class="code-header">fn <a href="#tymethod.local_context" class="fn">local_context</a>&lt;C&gt;(self, context: C) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;C, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReportCollection.html" title="trait rootcause::IntoReportCollection">IntoReportCollection</a>&lt;<a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;,
+    C: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Display.html" title="trait core::fmt::Display">Display</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a>,</div></h4></section></summary><div class="docblock"><p>Converts the error into a new local (non-thread-safe) <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> using
+the provided context. The current error is set as a child of the new
+<a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</p>
+<p>If the result is <code>Ok</code>, returns the value unchanged. If the result is
+<code>Err</code>, converts the error into a report collection and adds the
+provided context. The context becomes the primary error message,
+with the original error becoming part of the error chain.</p>
+<p>This method also works when the original error is a
+<a href="../report_collection/struct.ReportCollection.html" title="struct rootcause::report_collection::ReportCollection"><code>ReportCollection</code></a>, in which case all errors in that collection
+are set as children of the new <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</p>
+<p>See also <a href="trait.ResultExt.html#tymethod.context" title="method rootcause::prelude::ResultExt::context"><code>context</code></a> for a thread-safe version that
+returns a <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> that can be sent across thread boundaries.</p>
+<h5 id="examples-10"><a class="doc-anchor" href="#examples-10">§</a>Examples</h5>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::{io, rc::Rc};
+
+<span class="kw">use </span>rootcause::prelude::<span class="kw-2">*</span>;
+
+<span class="kw">fn </span>fetch_data(path: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, io::Error&gt; {
+    std::fs::read(path)
+}
+
+<span class="kw">let </span>result: <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, Report&lt;Rc&lt;<span class="kw-2">&amp;</span>str&gt;, <span class="kw">_</span>, markers::Local&gt;&gt; =
+    fetch_data(<span class="string">"user_data.bz2"</span>).local_context(Rc::from(<span class="string">"Failed to fetch user data"</span>));</code></pre></div></div></details><details class="toggle method-toggle" open><summary><section id="tymethod.local_context_with" class="method"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#509-513">Source</a><h4 class="code-header">fn <a href="#tymethod.local_context_with" class="fn">local_context_with</a>&lt;C, F&gt;(
+    self,
+    context: F,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;C, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReportCollection.html" title="trait rootcause::IntoReportCollection">IntoReportCollection</a>&lt;<a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;,
+    F: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>() -&gt; C,
+    C: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Display.html" title="trait core::fmt::Display">Display</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a>,</div></h4></section></summary><div class="docblock"><p>Converts the error into a new local (non-thread-safe) <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> using
+context generated by the provided closure. The current error is set
+as a child of the new <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</p>
+<p>This is similar to <a href="trait.ResultExt.html#tymethod.local_context" title="method rootcause::prelude::ResultExt::local_context"><code>local_context</code></a>, but the
+context is computed lazily using a closure. This can be useful when
+computing the context is expensive, as the closure will only be
+called if an error actually occurs.</p>
+<p>This method also works when the original error is a
+<a href="../report_collection/struct.ReportCollection.html" title="struct rootcause::report_collection::ReportCollection"><code>ReportCollection</code></a>, in which case all errors in that collection
+are set as children of the new <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</p>
+<p>See also <a href="trait.ResultExt.html#tymethod.context_with" title="method rootcause::prelude::ResultExt::context_with"><code>context_with</code></a> for a thread-safe
+version that returns a <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> that can be sent across thread
+boundaries.</p>
+<h5 id="examples-11"><a class="doc-anchor" href="#examples-11">§</a>Examples</h5>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::{io, rc::Rc};
+
+<span class="kw">use </span>rootcause::prelude::<span class="kw-2">*</span>;
+
+<span class="attr">#[derive(Debug)]
+</span><span class="kw">struct </span>ContextData {
+    timestamp: Rc&lt;String&gt;,
+    operation: String,
+}
+
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>ContextData {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">"{}: {}"</span>, <span class="self">self</span>.timestamp, <span class="self">self</span>.operation)
+    }
+}
+
+<span class="kw">fn </span>expensive_computation() -&gt; ContextData {
+    <span class="comment">// Expensive computation that builds context data
+    </span>ContextData {
+        timestamp: Rc::new(<span class="string">"12:34:56"</span>.to_string()),
+        operation: <span class="string">"file_read"</span>.to_string(),
+    }
+}
+
+<span class="kw">let </span>result: <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, Report&lt;ContextData, <span class="kw">_</span>, markers::Local&gt;&gt; =
+    std::fs::read(<span class="string">"user_data.bz2"</span>).local_context_with(expensive_computation);</code></pre></div></div></details><details class="toggle method-toggle" open><summary><section id="tymethod.local_context_custom" class="method"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#552-555">Source</a><h4 class="code-header">fn <a href="#tymethod.local_context_custom" class="fn">local_context_custom</a>&lt;H, C&gt;(
+    self,
+    context: C,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;C, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReportCollection.html" title="trait rootcause::IntoReportCollection">IntoReportCollection</a>&lt;<a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;,
+    H: <a class="trait" href="../handlers/trait.ContextHandler.html" title="trait rootcause::handlers::ContextHandler">ContextHandler</a>&lt;C&gt;,</div></h4></section></summary><div class="docblock"><p>Converts the error into a new local (non-thread-safe) <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> using
+the provided context. The current error is set as a child of the new
+<a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</p>
+<p>This is similar to <a href="trait.ResultExt.html#tymethod.local_context" title="method rootcause::prelude::ResultExt::local_context"><code>local_context</code></a>, but uses
+a custom <a href="../handlers/trait.ContextHandler.html" title="trait rootcause::handlers::ContextHandler"><code>ContextHandler</code></a> to control how the context is formatted
+and displayed.</p>
+<p>This method also works when the original error is a
+<a href="../report_collection/struct.ReportCollection.html" title="struct rootcause::report_collection::ReportCollection"><code>ReportCollection</code></a>, in which case all errors in that collection
+are set as children of the new <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</p>
+<p>See also <a href="trait.ResultExt.html#tymethod.context_custom" title="method rootcause::prelude::ResultExt::context_custom"><code>context_custom</code></a> for a thread-safe
+version that returns a <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> that can be sent across thread
+boundaries.</p>
+<h5 id="examples-12"><a class="doc-anchor" href="#examples-12">§</a>Examples</h5>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::{io, rc::Rc};
+
+<span class="kw">use </span>rootcause::prelude::<span class="kw-2">*</span>;
+
+<span class="attr">#[derive(Debug)]
+</span><span class="kw">enum </span>ErrorContext {
+    DeserializationError,
+    IoError,
+}
+
+<span class="kw">let </span>result: <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, Report&lt;Rc&lt;ErrorContext&gt;, <span class="kw">_</span>, markers::Local&gt;&gt; =
+    std::fs::read(<span class="string">"user_data.bz2"</span>)
+        .local_context_custom::&lt;handlers::Debug, <span class="kw">_</span>&gt;(Rc::new(ErrorContext::IoError));</code></pre></div></div></details><details class="toggle method-toggle" open><summary><section id="tymethod.local_context_custom_with" class="method"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#601-605">Source</a><h4 class="code-header">fn <a href="#tymethod.local_context_custom_with" class="fn">local_context_custom_with</a>&lt;H, C, F&gt;(
+    self,
+    context: F,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;C, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReportCollection.html" title="trait rootcause::IntoReportCollection">IntoReportCollection</a>&lt;<a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;,
+    F: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>() -&gt; C,
+    H: <a class="trait" href="../handlers/trait.ContextHandler.html" title="trait rootcause::handlers::ContextHandler">ContextHandler</a>&lt;C&gt;,</div></h4></section></summary><div class="docblock"><p>Converts the error into a new local (non-thread-safe) <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> using
+context generated by the provided closure. The current error is set
+as a child of the new <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</p>
+<p>Combines the lazy evaluation of
+<a href="trait.ResultExt.html#tymethod.local_context_with" title="method rootcause::prelude::ResultExt::local_context_with"><code>local_context_with</code></a> with the custom
+handler capabilities of
+<a href="trait.ResultExt.html#tymethod.local_context_custom" title="method rootcause::prelude::ResultExt::local_context_custom"><code>local_context_custom</code></a>.</p>
+<p>This method also works when the original error is a
+<a href="../report_collection/struct.ReportCollection.html" title="struct rootcause::report_collection::ReportCollection"><code>ReportCollection</code></a>, in which case all errors in that collection
+are set as children of the new <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</p>
+<p>See also <a href="trait.ResultExt.html#tymethod.context_custom_with" title="method rootcause::prelude::ResultExt::context_custom_with"><code>context_custom_with</code></a> for a
+thread-safe version that returns a <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> that can be sent
+across thread boundaries.</p>
+<h5 id="examples-13"><a class="doc-anchor" href="#examples-13">§</a>Examples</h5>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::{io, rc::Rc};
+
+<span class="kw">use </span>rootcause::prelude::<span class="kw-2">*</span>;
+
+<span class="attr">#[derive(Debug)]
+</span><span class="kw">struct </span>ErrorContext {
+    timestamp: Rc&lt;String&gt;,
+    operation: String,
+}
+
+<span class="kw">fn </span>expensive_computation() -&gt; Rc&lt;ErrorContext&gt; {
+    Rc::new(ErrorContext {
+        timestamp: Rc::new(<span class="string">"12:34:56"</span>.to_string()),
+        operation: <span class="string">"file_read"</span>.to_string(),
+    })
+}
+
+<span class="kw">let </span>result: <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, Report&lt;Rc&lt;ErrorContext&gt;, <span class="kw">_</span>, markers::Local&gt;&gt; =
+    std::fs::read(<span class="string">"user_data.bz2"</span>)
+        .local_context_custom_with::&lt;handlers::Debug, <span class="kw">_</span>, <span class="kw">_</span>&gt;(expensive_computation);</code></pre></div></div></details><details class="toggle method-toggle" open><summary><section id="tymethod.local_attach" class="method"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#632-635">Source</a><h4 class="code-header">fn <a href="#tymethod.local_attach" class="fn">local_attach</a>&lt;A&gt;(
+    self,
+    attachment: A,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>, Ownership = <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>&gt;,
+    A: 'static + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Display.html" title="trait core::fmt::Display">Display</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a>,</div></h4></section></summary><div class="docblock"><p>Converts the error into a local (non-thread-safe) <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> and adds
+the provided attachment to the <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</p>
+<p>If the result is <code>Ok</code>, returns the value unchanged. If the result is
+<code>Err</code>, converts the error into a <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> and attaches the
+provided data as an attachment. Attachments provide additional
+context without changing the primary error message.</p>
+<p>See also <a href="trait.ResultExt.html#tymethod.attach" title="method rootcause::prelude::ResultExt::attach"><code>attach</code></a> for a thread-safe version that
+returns a <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> that can be sent across thread boundaries.</p>
+<h5 id="examples-14"><a class="doc-anchor" href="#examples-14">§</a>Examples</h5>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::{io, rc::Rc};
+
+<span class="kw">use </span>rootcause::prelude::<span class="kw-2">*</span>;
+
+<span class="comment">// In this case it might make more sense to use `local_attach_with`, but
+// you can assume that the attachment is pre-computed.
+</span><span class="kw">let </span>attachment: Rc&lt;<span class="kw-2">&amp;</span>str&gt; = Rc::from(<span class="string">"input: invalid_data"</span>);
+<span class="kw">let </span>result: <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, Report&lt;io::Error, <span class="kw">_</span>, markers::Local&gt;&gt; =
+    std::fs::read(<span class="string">"user_data.bz2"</span>).local_attach(attachment);</code></pre></div></div></details><details class="toggle method-toggle" open><summary><section id="tymethod.local_attach_with" class="method"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#665-672">Source</a><h4 class="code-header">fn <a href="#tymethod.local_attach_with" class="fn">local_attach_with</a>&lt;A, F&gt;(
+    self,
+    attachment: F,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>, Ownership = <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>&gt;,
+    F: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>() -&gt; A,
+    A: 'static + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Display.html" title="trait core::fmt::Display">Display</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a>,</div></h4></section></summary><div class="docblock"><p>Converts the error into a local (non-thread-safe) <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> and adds an
+attachment generated by the provided closure to the <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</p>
+<p>This is similar to <a href="trait.ResultExt.html#tymethod.local_attach" title="method rootcause::prelude::ResultExt::local_attach"><code>local_attach</code></a>, but the
+attachment is computed lazily using a closure. This can be useful
+when computing the attachment is expensive, as the closure will only
+be called if an error actually occurs.</p>
+<p>See also <a href="trait.ResultExt.html#tymethod.attach_with" title="method rootcause::prelude::ResultExt::attach_with"><code>attach_with</code></a> for a thread-safe
+version that returns a <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> that can be sent across thread
+boundaries.</p>
+<h5 id="examples-15"><a class="doc-anchor" href="#examples-15">§</a>Examples</h5>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::{io, rc::Rc};
+
+<span class="kw">use </span>rootcause::prelude::<span class="kw-2">*</span>;
+
+<span class="kw">fn </span>get_debug_info() -&gt; String {
+    <span class="string">"complex computation result"</span>.to_string()
+}
+
+<span class="kw">let </span>result: <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, Report&lt;io::Error, <span class="kw">_</span>, markers::Local&gt;&gt; =
+    std::fs::read(<span class="string">"user_data.bz2"</span>)
+        .local_attach_with(|| Rc::new(<span class="macro">format!</span>(<span class="string">"debug info: {}"</span>, get_debug_info())));</code></pre></div></div></details><details class="toggle method-toggle" open><summary><section id="tymethod.local_attach_custom" class="method"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#711-718">Source</a><h4 class="code-header">fn <a href="#tymethod.local_attach_custom" class="fn">local_attach_custom</a>&lt;H, A&gt;(
+    self,
+    attachment: A,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;&gt;<div class="where">where
+    A: 'static,
+    E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>, Ownership = <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>&gt;,
+    H: <a class="trait" href="../handlers/trait.AttachmentHandler.html" title="trait rootcause::handlers::AttachmentHandler">AttachmentHandler</a>&lt;A&gt;,</div></h4></section></summary><div class="docblock"><p>Converts the error into a local (non-thread-safe) <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> and adds
+the provided attachment to the <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</p>
+<p>This is similar to <a href="trait.ResultExt.html#tymethod.local_attach" title="method rootcause::prelude::ResultExt::local_attach"><code>local_attach</code></a>, but uses a
+custom <a href="../handlers/trait.AttachmentHandler.html" title="trait rootcause::handlers::AttachmentHandler"><code>AttachmentHandler</code></a> to control how the attachment is
+formatted and displayed.</p>
+<p>See also <a href="trait.ResultExt.html#tymethod.attach_custom" title="method rootcause::prelude::ResultExt::attach_custom"><code>attach_custom</code></a> for a thread-safe
+version that returns a <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> that can be sent across thread
+boundaries.</p>
+<h5 id="examples-16"><a class="doc-anchor" href="#examples-16">§</a>Examples</h5>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::{io, rc::Rc};
+
+<span class="kw">use </span>rootcause::prelude::<span class="kw-2">*</span>;
+
+<span class="attr">#[derive(Debug)]
+</span><span class="kw">struct </span>RequestMetadata {
+    request_id: Rc&lt;u64&gt;,
+    user_id: u64,
+}
+
+<span class="comment">// In this case it might make more sense to use `local_attach_custom_with`, but
+// you can assume that the attachment is pre-computed.
+</span><span class="kw">let </span>metadata: Rc&lt;RequestMetadata&gt; = Rc::new(RequestMetadata {
+    request_id: Rc::new(<span class="number">12345</span>),
+    user_id: <span class="number">67890</span>,
+});
+
+<span class="kw">let </span>result: <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, Report&lt;io::Error, <span class="kw">_</span>, markers::Local&gt;&gt; =
+    std::fs::read(<span class="string">"user_data.bz2"</span>).local_attach_custom::&lt;handlers::Debug, <span class="kw">_</span>&gt;(metadata);</code></pre></div></div></details><details class="toggle method-toggle" open><summary><section id="tymethod.local_attach_custom_with" class="method"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#757-765">Source</a><h4 class="code-header">fn <a href="#tymethod.local_attach_custom_with" class="fn">local_attach_custom_with</a>&lt;H, A, F&gt;(
+    self,
+    attachment: F,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;&gt;<div class="where">where
+    A: 'static,
+    E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>, Ownership = <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>&gt;,
+    F: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>() -&gt; A,
+    H: <a class="trait" href="../handlers/trait.AttachmentHandler.html" title="trait rootcause::handlers::AttachmentHandler">AttachmentHandler</a>&lt;A&gt;,</div></h4></section></summary><div class="docblock"><p>Converts the error into a local (non-thread-safe) <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> and adds an
+attachment generated by the provided closure to the <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</p>
+<p>Combines the lazy evaluation of
+<a href="trait.ResultExt.html#tymethod.local_attach_with" title="method rootcause::prelude::ResultExt::local_attach_with"><code>local_attach_with</code></a> with the custom
+handler capabilities of
+<a href="trait.ResultExt.html#tymethod.local_attach_custom" title="method rootcause::prelude::ResultExt::local_attach_custom"><code>local_attach_custom</code></a>.</p>
+<p>See also <a href="trait.ResultExt.html#tymethod.attach_custom_with" title="method rootcause::prelude::ResultExt::attach_custom_with"><code>attach_custom_with</code></a> for a
+thread-safe version that returns a <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a> that can be sent
+across thread boundaries.</p>
+<h5 id="examples-17"><a class="doc-anchor" href="#examples-17">§</a>Examples</h5>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::{io, rc::Rc};
+
+<span class="kw">use </span>rootcause::prelude::<span class="kw-2">*</span>;
+
+<span class="attr">#[derive(Debug)]
+</span><span class="kw">struct </span>RequestMetadata {
+    request_id: Rc&lt;u64&gt;,
+    timestamp: String,
+}
+
+<span class="kw">fn </span>expensive_computation() -&gt; RequestMetadata {
+    RequestMetadata {
+        request_id: Rc::new(<span class="number">12345</span>),
+        timestamp: <span class="string">"12:34:56"</span>.to_string(),
+    }
+}
+
+<span class="kw">let </span>result: <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, Report&lt;io::Error, <span class="kw">_</span>, markers::Local&gt;&gt; =
+    std::fs::read(<span class="string">"user_data.bz2"</span>)
+        .local_attach_custom_with::&lt;handlers::Debug, <span class="kw">_</span>, <span class="kw">_</span>&gt;(|| Rc::new(expensive_computation()));</code></pre></div></div></details></div><h2 id="dyn-compatibility" class="section-header">Dyn Compatibility<a href="#dyn-compatibility" class="anchor">§</a></h2><div class="dyn-compatibility-info"><p>This trait is <b>not</b> <a href="https://doc.rust-lang.org/1.91.1/reference/items/traits.html#dyn-compatibility">dyn compatible</a>.</p><p><i>In older versions of Rust, dyn compatibility was called "object safety", so this trait is not object safe.</i></p></div><h2 id="foreign-impls" class="section-header">Implementations on Foreign Types<a href="#foreign-impls" class="anchor">§</a></h2><details class="toggle implementors-toggle"><summary><section id="impl-ResultExt%3CV,+E%3E-for-Result%3CV,+E%3E" class="impl"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#768-1008">Source</a><a href="#impl-ResultExt%3CV,+E%3E-for-Result%3CV,+E%3E" class="anchor">§</a><h3 class="code-header">impl&lt;V, E&gt; <a class="trait" href="trait.ResultExt.html" title="trait rootcause::prelude::ResultExt">ResultExt</a>&lt;V, E&gt; for <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, E&gt;</h3></section></summary><div class="impl-items"><section id="method.into_report" class="method trait-impl"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#770-778">Source</a><a href="#method.into_report" class="anchor">§</a><h4 class="code-header">fn <a href="#tymethod.into_report" class="fn">into_report</a>(self) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Ownership" title="type rootcause::IntoReport::Ownership">Ownership</a>, <a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;,</div></h4></section><section id="method.context" class="method trait-impl"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#781-790">Source</a><a href="#method.context" class="anchor">§</a><h4 class="code-header">fn <a href="#tymethod.context" class="fn">context</a>&lt;C&gt;(self, context: C) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;C, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReportCollection.html" title="trait rootcause::IntoReportCollection">IntoReportCollection</a>&lt;<a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;,
+    C: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Display.html" title="trait core::fmt::Display">Display</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a>,</div></h4></section><section id="method.context_with" class="method trait-impl"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#793-803">Source</a><a href="#method.context_with" class="anchor">§</a><h4 class="code-header">fn <a href="#tymethod.context_with" class="fn">context_with</a>&lt;C, F&gt;(
+    self,
+    context: F,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;C, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReportCollection.html" title="trait rootcause::IntoReportCollection">IntoReportCollection</a>&lt;<a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;,
+    F: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>() -&gt; C,
+    C: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Display.html" title="trait core::fmt::Display">Display</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a>,</div></h4></section><section id="method.context_custom" class="method trait-impl"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#806-816">Source</a><a href="#method.context_custom" class="anchor">§</a><h4 class="code-header">fn <a href="#tymethod.context_custom" class="fn">context_custom</a>&lt;H, C&gt;(
+    self,
+    context: C,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;C, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReportCollection.html" title="trait rootcause::IntoReportCollection">IntoReportCollection</a>&lt;<a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;,
+    C: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a>,
+    H: <a class="trait" href="../handlers/trait.ContextHandler.html" title="trait rootcause::handlers::ContextHandler">ContextHandler</a>&lt;C&gt;,</div></h4></section><section id="method.context_custom_with" class="method trait-impl"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#819-830">Source</a><a href="#method.context_custom_with" class="anchor">§</a><h4 class="code-header">fn <a href="#tymethod.context_custom_with" class="fn">context_custom_with</a>&lt;H, C, F&gt;(
+    self,
+    context: F,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;C, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReportCollection.html" title="trait rootcause::IntoReportCollection">IntoReportCollection</a>&lt;<a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;,
+    F: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>() -&gt; C,
+    C: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a>,
+    H: <a class="trait" href="../handlers/trait.ContextHandler.html" title="trait rootcause::handlers::ContextHandler">ContextHandler</a>&lt;C&gt;,</div></h4></section><section id="method.attach" class="method trait-impl"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#833-842">Source</a><a href="#method.attach" class="anchor">§</a><h4 class="code-header">fn <a href="#tymethod.attach" class="fn">attach</a>&lt;A&gt;(
+    self,
+    attachment: A,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>, Ownership = <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>&gt;,
+    A: 'static + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Display.html" title="trait core::fmt::Display">Display</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a>,</div></h4></section><section id="method.attach_with" class="method trait-impl"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#845-855">Source</a><a href="#method.attach_with" class="anchor">§</a><h4 class="code-header">fn <a href="#tymethod.attach_with" class="fn">attach_with</a>&lt;A, F&gt;(
+    self,
+    attachment: F,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>, Ownership = <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>&gt;,
+    F: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>() -&gt; A,
+    A: 'static + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Display.html" title="trait core::fmt::Display">Display</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a>,</div></h4></section><section id="method.attach_custom" class="method trait-impl"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#858-868">Source</a><a href="#method.attach_custom" class="anchor">§</a><h4 class="code-header">fn <a href="#tymethod.attach_custom" class="fn">attach_custom</a>&lt;H, A&gt;(
+    self,
+    attachment: A,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>, Ownership = <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>&gt;,
+    A: 'static + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a>,
+    H: <a class="trait" href="../handlers/trait.AttachmentHandler.html" title="trait rootcause::handlers::AttachmentHandler">AttachmentHandler</a>&lt;A&gt;,</div></h4></section><section id="method.attach_custom_with" class="method trait-impl"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#871-885">Source</a><a href="#method.attach_custom_with" class="anchor">§</a><h4 class="code-header">fn <a href="#tymethod.attach_custom_with" class="fn">attach_custom_with</a>&lt;H, A, F&gt;(
+    self,
+    attachment: F,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync">SendSync</a>, Ownership = <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>&gt;,
+    F: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>() -&gt; A,
+    A: 'static + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a>,
+    H: <a class="trait" href="../handlers/trait.AttachmentHandler.html" title="trait rootcause::handlers::AttachmentHandler">AttachmentHandler</a>&lt;A&gt;,</div></h4></section><section id="method.local_into_report" class="method trait-impl"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#888-896">Source</a><a href="#method.local_into_report" class="anchor">§</a><h4 class="code-header">fn <a href="#tymethod.local_into_report" class="fn">local_into_report</a>(self) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Ownership" title="type rootcause::IntoReport::Ownership">Ownership</a>, <a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;,</div></h4></section><section id="method.local_context" class="method trait-impl"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#899-908">Source</a><a href="#method.local_context" class="anchor">§</a><h4 class="code-header">fn <a href="#tymethod.local_context" class="fn">local_context</a>&lt;C&gt;(self, context: C) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;C, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReportCollection.html" title="trait rootcause::IntoReportCollection">IntoReportCollection</a>&lt;<a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;,
+    C: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Display.html" title="trait core::fmt::Display">Display</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a>,</div></h4></section><section id="method.local_context_with" class="method trait-impl"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#911-921">Source</a><a href="#method.local_context_with" class="anchor">§</a><h4 class="code-header">fn <a href="#tymethod.local_context_with" class="fn">local_context_with</a>&lt;C, F&gt;(
+    self,
+    context: F,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;C, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReportCollection.html" title="trait rootcause::IntoReportCollection">IntoReportCollection</a>&lt;<a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;,
+    F: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>() -&gt; C,
+    C: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Display.html" title="trait core::fmt::Display">Display</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a>,</div></h4></section><section id="method.local_context_custom" class="method trait-impl"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#924-933">Source</a><a href="#method.local_context_custom" class="anchor">§</a><h4 class="code-header">fn <a href="#tymethod.local_context_custom" class="fn">local_context_custom</a>&lt;H, C&gt;(
+    self,
+    context: C,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;C, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReportCollection.html" title="trait rootcause::IntoReportCollection">IntoReportCollection</a>&lt;<a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;,
+    H: <a class="trait" href="../handlers/trait.ContextHandler.html" title="trait rootcause::handlers::ContextHandler">ContextHandler</a>&lt;C&gt;,</div></h4></section><section id="method.local_context_custom_with" class="method trait-impl"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#936-946">Source</a><a href="#method.local_context_custom_with" class="anchor">§</a><h4 class="code-header">fn <a href="#tymethod.local_context_custom_with" class="fn">local_context_custom_with</a>&lt;H, C, F&gt;(
+    self,
+    context: F,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;C, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReportCollection.html" title="trait rootcause::IntoReportCollection">IntoReportCollection</a>&lt;<a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;,
+    F: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>() -&gt; C,
+    H: <a class="trait" href="../handlers/trait.ContextHandler.html" title="trait rootcause::handlers::ContextHandler">ContextHandler</a>&lt;C&gt;,</div></h4></section><section id="method.local_attach" class="method trait-impl"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#949-958">Source</a><a href="#method.local_attach" class="anchor">§</a><h4 class="code-header">fn <a href="#tymethod.local_attach" class="fn">local_attach</a>&lt;A&gt;(
+    self,
+    attachment: A,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>, Ownership = <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>&gt;,
+    A: 'static + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Display.html" title="trait core::fmt::Display">Display</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a>,</div></h4></section><section id="method.local_attach_with" class="method trait-impl"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#961-974">Source</a><a href="#method.local_attach_with" class="anchor">§</a><h4 class="code-header">fn <a href="#tymethod.local_attach_with" class="fn">local_attach_with</a>&lt;A, F&gt;(
+    self,
+    attachment: F,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>, Ownership = <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>&gt;,
+    F: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>() -&gt; A,
+    A: 'static + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Display.html" title="trait core::fmt::Display">Display</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a>,</div></h4></section><section id="method.local_attach_custom" class="method trait-impl"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#977-990">Source</a><a href="#method.local_attach_custom" class="anchor">§</a><h4 class="code-header">fn <a href="#tymethod.local_attach_custom" class="fn">local_attach_custom</a>&lt;H, A&gt;(
+    self,
+    attachment: A,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;&gt;<div class="where">where
+    A: 'static,
+    E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>, Ownership = <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>&gt;,
+    H: <a class="trait" href="../handlers/trait.AttachmentHandler.html" title="trait rootcause::handlers::AttachmentHandler">AttachmentHandler</a>&lt;A&gt;,</div></h4></section><section id="method.local_attach_custom_with" class="method trait-impl"><a class="src rightside" href="../../src/rootcause/result_ext.rs.html#993-1007">Source</a><a href="#method.local_attach_custom_with" class="anchor">§</a><h4 class="code-header">fn <a href="#tymethod.local_attach_custom_with" class="fn">local_attach_custom_with</a>&lt;H, A, F&gt;(
+    self,
+    attachment: F,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;V, <a class="struct" href="../struct.Report.html" title="struct rootcause::Report">Report</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>, <a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>&gt;&gt;<div class="where">where
+    A: 'static,
+    E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;<a class="struct" href="../markers/struct.Local.html" title="struct rootcause::markers::Local">Local</a>, Ownership = <a class="struct" href="../markers/struct.Mutable.html" title="struct rootcause::markers::Mutable">Mutable</a>&gt;,
+    F: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>() -&gt; A,
+    H: <a class="trait" href="../handlers/trait.AttachmentHandler.html" title="trait rootcause::handlers::AttachmentHandler">AttachmentHandler</a>&lt;A&gt;,</div></h4></section></div></details><h2 id="implementors" class="section-header">Implementors<a href="#implementors" class="anchor">§</a></h2><div id="implementors-list"></div><script src="../../trait.impl/rootcause/result_ext/trait.ResultExt.js" data-ignore-extern-crates="core" async></script></section></div></main></body></html>

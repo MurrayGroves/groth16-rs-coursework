@@ -1,0 +1,122 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Individual attachments for error reports."><title>rootcause::report_attachment - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-e56847b5.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rootcause" data-themes="" data-resource-suffix="" data-rustdoc-version="1.91.1 (ed61e7d7e 2025-11-07)" data-channel="1.91.1" data-search-js="search-e256b49e.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../static.files/storage-e2aeef58.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../static.files/main-6dc2a7f3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">Module report_attachment</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../rootcause/index.html">rootcause</a><span class="version">0.10.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Module report_<wbr>attachment</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#core-types" title="Core Types">Core Types</a></li><li><a href="#creating-attachments" title="Creating Attachments">Creating Attachments</a></li><li><a href="#type-parameters" title="Type Parameters">Type Parameters</a></li><li><a href="#attachment-references" title="Attachment References">Attachment References</a></li><li><a href="#type-erasure-and-downcasting" title="Type Erasure and Downcasting">Type Erasure and Downcasting</a></li><li><a href="#formatting-and-handlers" title="Formatting and Handlers">Formatting and Handlers</a></li></ul><h3><a href="#structs">Module Items</a></h3><ul class="block"><li><a href="#structs" title="Structs">Structs</a></li></ul></section><div id="rustdoc-modnav"><h2 class="in-crate"><a href="../index.html">In crate rootcause</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../index.html">rootcause</a></div><h1>Module <span>report_<wbr>attachment</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../src/rootcause/report_attachment/mod.rs.html#1-157">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Individual attachments for error reports.</p>
+<p>This module provides types for creating and working with individual
+attachments that can be added to error reports. Attachments allow you to
+include additional context, data, or information alongside the main error
+message.</p>
+<h2 id="core-types"><a class="doc-anchor" href="#core-types">§</a>Core Types</h2>
+<ul>
+<li><a href="struct.ReportAttachment.html" title="struct rootcause::report_attachment::ReportAttachment"><code>ReportAttachment</code></a>: An owned attachment that can be added to a report</li>
+<li><a href="struct.ReportAttachmentRef.html" title="struct rootcause::report_attachment::ReportAttachmentRef"><code>ReportAttachmentRef</code></a>: A reference to an attachment, typically obtained
+from a report</li>
+</ul>
+<h2 id="creating-attachments"><a class="doc-anchor" href="#creating-attachments">§</a>Creating Attachments</h2>
+<p>Attachments can be created using the <a href="struct.ReportAttachment.html#method.new" title="associated function rootcause::report_attachment::ReportAttachment::new"><code>ReportAttachment::new</code></a> method or
+the <a href="../macro.report_attachment.html" title="macro rootcause::report_attachment"><code>report_attachment!</code></a> macro:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>rootcause::{prelude::<span class="kw-2">*</span>, report_attachment::ReportAttachment};
+
+<span class="comment">// Create a simple string attachment
+</span><span class="kw">let </span>attachment: ReportAttachment&lt;<span class="kw-2">&amp;</span>str&gt; = ReportAttachment::new(<span class="string">"Additional information"</span>);
+<span class="kw">let </span>attachment: ReportAttachment&lt;<span class="kw">dyn </span>Any&gt; = <span class="macro">report_attachment!</span>(<span class="string">"Additional information"</span>);
+
+<span class="comment">// Create an attachment from a custom type using Debug formatting
+</span><span class="attr">#[derive(Debug, Clone)]
+</span><span class="kw">struct </span>AttachmentData {
+    file: String,
+    line: u32,
+}
+
+<span class="kw">let </span>attachment_data = AttachmentData {
+    file: <span class="string">"main.rs"</span>.to_string(),
+    line: <span class="number">42</span>,
+};
+<span class="kw">let </span>debug_attachment: ReportAttachment&lt;AttachmentData&gt; =
+    ReportAttachment::new_custom::&lt;handlers::Debug&gt;(attachment_data.clone());
+<span class="kw">let </span>debug_attachment: ReportAttachment&lt;AttachmentData&gt; = <span class="macro">report_attachment!</span>(attachment_data);</code></pre></div><h2 id="type-parameters"><a class="doc-anchor" href="#type-parameters">§</a>Type Parameters</h2>
+<p>Both types have the same generic parameters:</p>
+<ul>
+<li><strong>Attachment type</strong>: Can be a concrete type or <code>dyn Any</code> for type erasure</li>
+<li><strong>Thread safety</strong>: <a href="../markers/struct.SendSync.html" title="struct rootcause::markers::SendSync"><code>SendSync</code></a> (default) for thread-safe attachments, or
+<a href="../markers/struct.Local.html" title="struct rootcause::markers::Local"><code>Local</code></a> for single-threaded use</li>
+</ul>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::rc::Rc;
+
+<span class="kw">use </span>rootcause::{markers, prelude::<span class="kw-2">*</span>, report_attachment::ReportAttachment};
+
+<span class="comment">// Send + Sync attachment (default)
+</span><span class="kw">let </span>attachment: ReportAttachment&lt;String, markers::SendSync&gt; =
+    ReportAttachment::new(<span class="string">"Thread-safe data"</span>.to_string());
+
+<span class="comment">// Local-only attachment (cannot be sent between threads)
+</span><span class="kw">let </span>local_data = Rc::new(<span class="string">"Local data"</span>.to_string());
+<span class="kw">let </span>local_attachment: ReportAttachment&lt;Rc&lt;String&gt;, markers::Local&gt; =
+    ReportAttachment::new(local_data);
+
+<span class="comment">// Send + Sync attachments can be converted to local-only
+</span><span class="kw">let </span>local_conversion: ReportAttachment&lt;String, markers::Local&gt; = attachment.into_local();</code></pre></div><h2 id="attachment-references"><a class="doc-anchor" href="#attachment-references">§</a>Attachment References</h2>
+<p>When attachments are stored in reports, you typically work with
+<a href="struct.ReportAttachmentRef.html" title="struct rootcause::report_attachment::ReportAttachmentRef"><code>ReportAttachmentRef</code></a> which provides access to the attachment data without
+taking ownership:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>rootcause::{prelude::<span class="kw-2">*</span>, report_attachment::ReportAttachment};
+
+<span class="kw">let </span>attachment = ReportAttachment::new(<span class="string">"Important context"</span>);
+<span class="kw">let </span><span class="kw-2">mut </span>report = <span class="macro">report!</span>(<span class="string">"An error occurred"</span>);
+report.attachments_mut().push(attachment.into_dyn_any());
+
+<span class="comment">// Access the attachment through a reference
+</span><span class="kw">let </span>attachment_ref = report.attachments().get(<span class="number">0</span>).unwrap();
+<span class="macro">println!</span>(<span class="string">"Attachment: {}"</span>, attachment_ref);</code></pre></div><h2 id="type-erasure-and-downcasting"><a class="doc-anchor" href="#type-erasure-and-downcasting">§</a>Type Erasure and Downcasting</h2>
+<p>Attachments support type erasure through <code>dyn Any</code>, allowing collections of
+different attachment types. You can downcast back to concrete types when
+needed:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::any::{Any, TypeId};
+
+<span class="kw">use </span>rootcause::{prelude::<span class="kw-2">*</span>, report_attachment::ReportAttachment};
+
+<span class="kw">let </span>attachment: ReportAttachment&lt;<span class="kw-2">&amp;</span>str&gt; = ReportAttachment::new(<span class="string">"text data"</span>);
+<span class="kw">let </span>erased: ReportAttachment&lt;<span class="kw">dyn </span>Any&gt; = attachment.into_dyn_any();
+
+<span class="comment">// Check the type at runtime
+</span><span class="macro">assert_eq!</span>(erased.inner_type_id(), TypeId::of::&lt;<span class="kw-2">&amp;</span>str&gt;());
+
+<span class="comment">// Safely downcast back to the original type
+</span><span class="kw">let </span>attachment_ref = erased.as_ref();
+<span class="kw">let </span>typed_ref = attachment_ref.downcast_attachment::&lt;<span class="kw-2">&amp;</span>str&gt;().unwrap();</code></pre></div><h2 id="formatting-and-handlers"><a class="doc-anchor" href="#formatting-and-handlers">§</a>Formatting and Handlers</h2>
+<p>Attachments use handlers to control how they are formatted in reports.
+The default handler uses the <a href="../handlers/struct.Display.html" title="struct rootcause::handlers::Display"><code>Display</code></a> handler, but you can also use
+the <a href="../handlers/struct.Debug.html" title="struct rootcause::handlers::Debug"><code>Debug</code></a> handler or create your own:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>rootcause::{prelude::<span class="kw-2">*</span>, report_attachment::ReportAttachment};
+
+<span class="attr">#[derive(Debug)]
+</span><span class="kw">struct </span>MyData {
+    value: i32,
+}
+
+<span class="comment">// Use Display formatting (default)
+</span><span class="kw">let </span>display_attachment: ReportAttachment&lt;<span class="kw-2">&amp;</span>str&gt; = ReportAttachment::new(<span class="string">"text"</span>);
+
+<span class="comment">// Use Debug formatting explicitly
+</span><span class="kw">let </span>debug_attachment: ReportAttachment&lt;MyData&gt; =
+    ReportAttachment::new_custom::&lt;handlers::Debug&gt;(MyData { value: <span class="number">42 </span>});
+
+<span class="kw">struct </span>MyOtherData {
+    value: i32,
+}
+
+<span class="kw">struct </span>MyDataHandler;
+<span class="kw">impl </span>rootcause::handlers::AttachmentHandler&lt;MyOtherData&gt; <span class="kw">for </span>MyDataHandler {
+    <span class="kw">fn </span>debug(data: <span class="kw-2">&amp;</span>MyOtherData, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; core::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">"MyOtherData value is: {}"</span>, data.value)
+    }
+
+    <span class="kw">fn </span>display(data: <span class="kw-2">&amp;</span>MyOtherData, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; core::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">"MyOtherData value is: {}"</span>, data.value)
+    }
+}
+
+<span class="kw">let </span>custom_attachment: ReportAttachment&lt;MyOtherData&gt; =
+    ReportAttachment::new_custom::&lt;MyDataHandler&gt;(MyOtherData { value: <span class="number">100 </span>});</code></pre></div></div></details><h2 id="structs" class="section-header">Structs<a href="#structs" class="anchor">§</a></h2><dl class="item-table"><dt><a class="struct" href="struct.ReportAttachment.html" title="struct rootcause::report_attachment::ReportAttachment">Report<wbr>Attachment</a></dt><dd>An attachment to be attached to a <a href="../struct.Report.html" title="struct rootcause::Report"><code>Report</code></a>.</dd><dt><a class="struct" href="struct.ReportAttachmentRef.html" title="struct rootcause::report_attachment::ReportAttachmentRef">Report<wbr>Attachment<wbr>Ref</a></dt><dd>A reference to a <a href="struct.ReportAttachment.html" title="struct rootcause::report_attachment::ReportAttachment"><code>ReportAttachment</code></a>.</dd></dl></section></div></main></body></html>

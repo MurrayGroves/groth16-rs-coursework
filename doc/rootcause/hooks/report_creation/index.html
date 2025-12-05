@@ -1,0 +1,84 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Report creation hooks for automatic report modification."><title>rootcause::hooks::report_creation - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e56847b5.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rootcause" data-themes="" data-resource-suffix="" data-rustdoc-version="1.91.1 (ed61e7d7e 2025-11-07)" data-channel="1.91.1" data-search-js="search-e256b49e.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../../static.files/storage-e2aeef58.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../../static.files/main-6dc2a7f3.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">Module report_creation</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../rootcause/index.html">rootcause</a><span class="version">0.10.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Module report_<wbr>creation</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#hook-types" title="Hook Types">Hook Types</a></li><li><a href="#examples" title="Examples">Examples</a><ul><li><a href="#registering-a-custom-report-creation-hook" title="Registering a Custom Report Creation Hook">Registering a Custom Report Creation Hook</a></li><li><a href="#registering-an-attachment-collector-hook" title="Registering an Attachment Collector Hook">Registering an Attachment Collector Hook</a></li><li><a href="#using-a-closure-as-an-attachment-collector" title="Using a Closure as an Attachment Collector">Using a Closure as an Attachment Collector</a></li></ul></li></ul><h3><a href="#traits">Module Items</a></h3><ul class="block"><li><a href="#traits" title="Traits">Traits</a></li><li><a href="#functions" title="Functions">Functions</a></li></ul></section><div id="rustdoc-modnav"><h2><a href="../index.html">In rootcause::<wbr>hooks</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../../index.html">rootcause</a>::<wbr><a href="../index.html">hooks</a></div><h1>Module <span>report_<wbr>creation</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../../src/rootcause/hooks/report_creation.rs.html#1-558">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Report creation hooks for automatic report modification.</p>
+<p>This module provides a system for registering hooks that are automatically
+executed when reports are created. These hooks can add additional context
+or attachments to reports automatically, without requiring manual
+intervention from the code creating the report.</p>
+<h2 id="hook-types"><a class="doc-anchor" href="#hook-types">§</a>Hook Types</h2>
+<p>There are two main types of hooks:</p>
+<ol>
+<li>
+<p><a href="trait.ReportCreationHook.html" title="trait rootcause::hooks::report_creation::ReportCreationHook"><code>ReportCreationHook</code></a>: General hooks that get access to the entire
+report during creation and can perform arbitrary operations.</p>
+</li>
+<li>
+<p><a href="trait.AttachmentCollectorHook.html" title="trait rootcause::hooks::report_creation::AttachmentCollectorHook"><code>AttachmentCollectorHook</code></a>: Specialized hooks that collect specific
+types of data and automatically attach them to reports.</p>
+</li>
+</ol>
+<p>Internally the attachment collector hooks are converted to report creation
+hooks and registered using the same system. They exist to provide a simpler
+API for the common use case of adding attachments.</p>
+<h2 id="examples"><a class="doc-anchor" href="#examples">§</a>Examples</h2><h3 id="registering-a-custom-report-creation-hook"><a class="doc-anchor" href="#registering-a-custom-report-creation-hook">§</a>Registering a Custom Report Creation Hook</h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>rootcause::{
+    ReportMut,
+    hooks::report_creation::{ReportCreationHook, register_report_creation_hook},
+    markers::{Local, SendSync},
+    prelude::<span class="kw-2">*</span>,
+};
+
+<span class="kw">struct </span>MyHook;
+
+<span class="kw">impl </span>ReportCreationHook <span class="kw">for </span>MyHook {
+    <span class="kw">fn </span>on_local_creation(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>report: ReportMut&lt;<span class="lifetime">'_</span>, <span class="kw">dyn </span>std::any::Any, Local&gt;) {
+        <span class="comment">// Add custom logic for local reports
+        </span><span class="kw">let </span>attachment = <span class="macro">report_attachment!</span>(<span class="string">"Custom local context"</span>);
+        report.attachments_mut().push(attachment.into());
+    }
+
+    <span class="kw">fn </span>on_sendsync_creation(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>report: ReportMut&lt;<span class="lifetime">'_</span>, <span class="kw">dyn </span>std::any::Any, SendSync&gt;) {
+        <span class="comment">// Add custom logic for send+sync reports
+        </span><span class="kw">let </span>attachment = <span class="macro">report_attachment!</span>(<span class="string">"Custom sendsync context"</span>);
+        report.attachments_mut().push(attachment.into());
+    }
+}
+
+<span class="comment">// Register the hook
+</span>register_report_creation_hook(MyHook);</code></pre></div><h3 id="registering-an-attachment-collector-hook"><a class="doc-anchor" href="#registering-an-attachment-collector-hook">§</a>Registering an Attachment Collector Hook</h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>rootcause::{
+    hooks::report_creation::{AttachmentCollectorHook, register_attachment_collector_hook},
+    prelude::<span class="kw-2">*</span>,
+};
+
+<span class="kw">struct </span>ProcessIdCollector;
+
+<span class="attr">#[derive(Debug)]
+</span><span class="kw">struct </span>ProcessId(u32);
+
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>ProcessId {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">"Process ID: {}"</span>, <span class="self">self</span>.<span class="number">0</span>)
+    }
+}
+
+<span class="kw">impl </span>AttachmentCollectorHook&lt;u32&gt; <span class="kw">for </span>ProcessIdCollector {
+    <span class="kw">type </span>Handler = handlers::Display;
+
+    <span class="kw">fn </span>collect(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        std::process::id()
+    }
+}
+
+<span class="comment">// Register the collector
+</span>register_attachment_collector_hook(ProcessIdCollector);</code></pre></div><h3 id="using-a-closure-as-an-attachment-collector"><a class="doc-anchor" href="#using-a-closure-as-an-attachment-collector">§</a>Using a Closure as an Attachment Collector</h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>rootcause::hooks::report_creation::register_attachment_collector_hook;
+
+<span class="comment">// Register a simple closure that collects the current timestamp
+</span>register_attachment_collector_hook(|| {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_secs()
+});</code></pre></div></div></details><h2 id="traits" class="section-header">Traits<a href="#traits" class="anchor">§</a></h2><dl class="item-table"><dt><a class="trait" href="trait.AttachmentCollectorHook.html" title="trait rootcause::hooks::report_creation::AttachmentCollectorHook">Attachment<wbr>Collector<wbr>Hook</a></dt><dd>A hook that collects data to be automatically attached to reports when they
+are created.</dd><dt><a class="trait" href="trait.ReportCreationHook.html" title="trait rootcause::hooks::report_creation::ReportCreationHook">Report<wbr>Creation<wbr>Hook</a></dt><dd>A hook that is called whenever a report is created.</dd></dl><h2 id="functions" class="section-header">Functions<a href="#functions" class="anchor">§</a></h2><dl class="item-table"><dt><a class="fn" href="fn.register_attachment_collector_hook.html" title="fn rootcause::hooks::report_creation::register_attachment_collector_hook">register_<wbr>attachment_<wbr>collector_<wbr>hook</a></dt><dd>Registers an attachment collector hook that will automatically collect and
+attach data to reports.</dd><dt><a class="fn" href="fn.register_report_creation_hook.html" title="fn rootcause::hooks::report_creation::register_report_creation_hook">register_<wbr>report_<wbr>creation_<wbr>hook</a></dt><dd>Registers a report creation hook that will be called whenever a report is
+created.</dd></dl></section></div></main></body></html>

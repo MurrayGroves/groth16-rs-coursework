@@ -1,0 +1,37 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Formatting overrides for customizing how specific types are formatted in error reports."><title>rootcause::hooks::formatting_overrides - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e56847b5.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rootcause" data-themes="" data-resource-suffix="" data-rustdoc-version="1.91.1 (ed61e7d7e 2025-11-07)" data-channel="1.91.1" data-search-js="search-e256b49e.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../../static.files/storage-e2aeef58.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../../static.files/main-6dc2a7f3.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">Module formatting_overrides</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../rootcause/index.html">rootcause</a><span class="version">0.10.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Module formatting_<wbr>overrides</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#overview" title="Overview">Overview</a><ul><li><a href="#submodules" title="Submodules">Submodules</a></li></ul></li></ul><h3><a href="#modules">Module Items</a></h3><ul class="block"><li><a href="#modules" title="Modules">Modules</a></li></ul></section><div id="rustdoc-modnav"><h2><a href="../index.html">In rootcause::<wbr>hooks</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../../index.html">rootcause</a>::<wbr><a href="../index.html">hooks</a></div><h1>Module <span>formatting_<wbr>overrides</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../../src/rootcause/hooks/formatting_overrides/mod.rs.html#1-34">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Formatting overrides for customizing how specific types are formatted in
+error reports.</p>
+<p>This module provides a hook system that allows you to customize how specific
+types of data are displayed when they appear in error reports. This is
+particularly useful when you want domain-specific formatting, enhanced
+readability, or consistent presentation across your application.</p>
+<h2 id="overview"><a class="doc-anchor" href="#overview">§</a>Overview</h2>
+<p>The formatting override system works by registering hooks for specific types
+that will be called whenever those types need to be formatted in an error
+report. There are two main categories of formatting overrides:</p>
+<h3 id="submodules"><a class="doc-anchor" href="#submodules">§</a>Submodules</h3>
+<ul>
+<li>
+<p><a href="attachment/index.html" title="mod rootcause::hooks::formatting_overrides::attachment"><code>attachment</code></a> - Customize formatting of error report attachments
+(additional data)</p>
+<ul>
+<li>Custom display formatting for attachment types</li>
+<li>Control attachment placement (inline, with headers, in appendix, hidden)</li>
+<li>Set priorities for attachment ordering</li>
+<li>Handle sensitive data by hiding attachments</li>
+</ul>
+</li>
+<li>
+<p><a href="context/index.html" title="mod rootcause::hooks::formatting_overrides::context"><code>context</code></a> - Customize formatting of error report contexts (main error
+types)</p>
+<ul>
+<li>Custom display and debug formatting for error types</li>
+<li>Domain-specific error presentation</li>
+<li>Enhanced debugging information</li>
+</ul>
+</li>
+</ul>
+<p>See the individual submodule documentation for detailed examples and
+comprehensive API reference.</p>
+</div></details><h2 id="modules" class="section-header">Modules<a href="#modules" class="anchor">§</a></h2><dl class="item-table"><dt><a class="mod" href="attachment/index.html" title="mod rootcause::hooks::formatting_overrides::attachment">attachment</a></dt><dd>Attachment formatting override system for customizing how error report
+attachments are displayed.</dd><dt><a class="mod" href="context/index.html" title="mod rootcause::hooks::formatting_overrides::context">context</a></dt><dd>Context formatting override system for customizing how error report contexts
+are displayed.</dd></dl></section></div></main></body></html>

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["Cloneable","Local","Mutable","SendSync","Uncloneable"],"trait":["ObjectMarkerFor","ReportOwnershipMarker"]};

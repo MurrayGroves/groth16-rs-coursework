@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["fq","fq3","fq6","fr","g1","g2"],"struct":["Config","Fq3Config","Fq6Config","FqConfig","FrConfig"],"type":["Fq","Fq3","Fq6","Fr","G1Affine","G1Prepared","G1Projective","G2Affine","G2Prepared","G2Projective","MNT6_753"]};

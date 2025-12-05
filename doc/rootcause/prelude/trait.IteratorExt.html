@@ -1,0 +1,129 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Extension methods for iterators over `Result` types to collect errors."><title>IteratorExt in rootcause::prelude - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-e56847b5.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rootcause" data-themes="" data-resource-suffix="" data-rustdoc-version="1.91.1 (ed61e7d7e 2025-11-07)" data-channel="1.91.1" data-search-js="search-e256b49e.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../static.files/storage-e2aeef58.js"></script><script defer src="sidebar-items.js"></script><script defer src="../../static.files/main-6dc2a7f3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc trait"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">IteratorExt</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../rootcause/index.html">rootcause</a><span class="version">0.10.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Iterator<wbr>Ext</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#when-to-use" title="When to Use">When to Use</a></li><li><a href="#comparison-to-standard-collect" title="Comparison to Standard Collect">Comparison to Standard Collect</a></li></ul><h3><a href="#required-methods">Required Methods</a></h3><ul class="block"><li><a href="#tymethod.collect_reports" title="collect_reports">collect_reports</a></li><li><a href="#tymethod.collect_reports_vec" title="collect_reports_vec">collect_reports_vec</a></li></ul><h3><a href="#dyn-compatibility">Dyn Compatibility</a></h3><h3><a href="#implementors">Implementors</a></h3></section><div id="rustdoc-modnav"><h2><a href="index.html">In rootcause::<wbr>prelude</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../index.html">rootcause</a>::<wbr><a href="index.html">prelude</a></div><h1>Trait <span class="trait">Iterator<wbr>Ext</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../src/rootcause/iterator_ext.rs.html#43-156">Source</a> </span></div><pre class="rust item-decl"><code>pub trait IteratorExt&lt;A, E&gt;: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/iter/traits/iterator/trait.Iterator.html" title="trait core::iter::traits::iterator::Iterator">Iterator</a>&lt;Item = <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;A, E&gt;&gt; {
+    // Required methods
+    fn <a href="#tymethod.collect_reports" class="fn">collect_reports</a>&lt;Container, ThreadSafety&gt;(
+        self,
+    ) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;Container, <a class="struct" href="../report_collection/struct.ReportCollection.html" title="struct rootcause::report_collection::ReportCollection">ReportCollection</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, ThreadSafety&gt;&gt;
+       <span class="where">where Container: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/iter/traits/collect/trait.FromIterator.html" title="trait core::iter::traits::collect::FromIterator">FromIterator</a>&lt;A&gt;,
+             E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;ThreadSafety&gt;</span>;
+<span class="item-spacer"></span>    fn <a href="#tymethod.collect_reports_vec" class="fn">collect_reports_vec</a>&lt;ThreadSafety&gt;(
+        self,
+    ) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/1.91.1/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;A&gt;, <a class="struct" href="../report_collection/struct.ReportCollection.html" title="struct rootcause::report_collection::ReportCollection">ReportCollection</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, ThreadSafety&gt;&gt;
+       <span class="where">where E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;ThreadSafety&gt;</span>;
+}</code></pre><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Extension methods for iterators over <code>Result</code> types to collect errors.</p>
+<p>This trait provides methods to collect successful values while accumulating
+all errors into a <a href="../report_collection/struct.ReportCollection.html" title="struct rootcause::report_collection::ReportCollection"><code>ReportCollection</code></a>, rather than stopping at the first
+error like <a href="https://doc.rust-lang.org/1.91.1/core/iter/traits/iterator/trait.Iterator.html#method.collect" title="method core::iter::traits::iterator::Iterator::collect"><code>Iterator::collect</code></a> does.</p>
+<h2 id="when-to-use"><a class="doc-anchor" href="#when-to-use">§</a>When to Use</h2>
+<p>Use these methods when you want to:</p>
+<ul>
+<li>Process all items in an iterator, even if some fail</li>
+<li>Collect all errors that occurred, not just the first one</li>
+<li>Validate multiple items and report all validation failures at once</li>
+</ul>
+<h2 id="comparison-to-standard-collect"><a class="doc-anchor" href="#comparison-to-standard-collect">§</a>Comparison to Standard Collect</h2>
+<p>The standard library’s <a href="https://doc.rust-lang.org/1.91.1/core/iter/traits/iterator/trait.Iterator.html#method.collect" title="method core::iter::traits::iterator::Iterator::collect"><code>Iterator::collect</code></a> stops at the first error, while
+these methods continue processing and collect all errors:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>rootcause::{prelude::<span class="kw-2">*</span>, report_collection::ReportCollection};
+
+<span class="kw">let </span>inputs = <span class="macro">vec!</span>[<span class="string">"1"</span>, <span class="string">"2"</span>, <span class="string">"invalid"</span>, <span class="string">"4"</span>, <span class="string">"bad"</span>];
+
+<span class="comment">// Standard collect stops at first error
+</span><span class="kw">let </span>standard: <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, <span class="kw">_</span>&gt; = inputs.iter().map(|s| s.parse::&lt;u8&gt;()).collect();
+<span class="macro">assert!</span>(standard.is_err()); <span class="comment">// Stopped at "invalid", never saw "bad"
+
+// collect_reports_vec processes ALL items and collects ALL errors
+</span><span class="kw">let </span>result: <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, ReportCollection&lt;std::num::ParseIntError&gt;&gt; = inputs
+    .into_iter()
+    .map(|s| s.parse::&lt;u8&gt;())
+    .collect_reports_vec();
+
+<span class="macro">assert!</span>(result.is_err());
+<span class="kw">let </span>all_errors = result.unwrap_err();
+<span class="macro">assert_eq!</span>(all_errors.len(), <span class="number">2</span>); <span class="comment">// Both "invalid" and "bad" collected</span></code></pre></div></div></details><h2 id="required-methods" class="section-header">Required Methods<a href="#required-methods" class="anchor">§</a></h2><div class="methods"><details class="toggle method-toggle" open><summary><section id="tymethod.collect_reports" class="method"><a class="src rightside" href="../../src/rootcause/iterator_ext.rs.html#106-111">Source</a><h4 class="code-header">fn <a href="#tymethod.collect_reports" class="fn">collect_reports</a>&lt;Container, ThreadSafety&gt;(
+    self,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;Container, <a class="struct" href="../report_collection/struct.ReportCollection.html" title="struct rootcause::report_collection::ReportCollection">ReportCollection</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, ThreadSafety&gt;&gt;<div class="where">where
+    Container: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/iter/traits/collect/trait.FromIterator.html" title="trait core::iter::traits::collect::FromIterator">FromIterator</a>&lt;A&gt;,
+    E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;ThreadSafety&gt;,</div></h4></section></summary><div class="docblock"><p>Collects successful values into a container, or all errors into a
+<a href="../report_collection/struct.ReportCollection.html" title="struct rootcause::report_collection::ReportCollection"><code>ReportCollection</code></a>.</p>
+<p>This method processes the entire iterator, collecting all <code>Ok</code> values
+into the specified container type. If any <code>Err</code> values are
+encountered, iteration continues to collect <strong>all</strong> errors before
+returning them in a <a href="../report_collection/struct.ReportCollection.html" title="struct rootcause::report_collection::ReportCollection"><code>ReportCollection</code></a>.</p>
+<p>This is different from using <a href="https://doc.rust-lang.org/1.91.1/core/iter/traits/iterator/trait.Iterator.html#method.collect" title="method core::iter::traits::iterator::Iterator::collect"><code>Iterator::collect</code></a> on <code>Result</code>s, which
+stops at the first error.</p>
+<h5 id="type-parameters"><a class="doc-anchor" href="#type-parameters">§</a>Type Parameters</h5>
+<ul>
+<li><code>Container</code>: The collection type for successful values (e.g., <code>Vec</code>,
+<code>HashSet</code>)</li>
+<li><code>ThreadSafety</code>: The thread-safety marker for the error collection</li>
+</ul>
+<h5 id="returns"><a class="doc-anchor" href="#returns">§</a>Returns</h5>
+<ul>
+<li><code>Ok(Container)</code>: If all items were successful</li>
+<li><code>Err(ReportCollection)</code>: If any errors occurred, containing all of
+them</li>
+</ul>
+<h5 id="examples"><a class="doc-anchor" href="#examples">§</a>Examples</h5><h6 id="collecting-into-different-container-types"><a class="doc-anchor" href="#collecting-into-different-container-types">§</a>Collecting into Different Container Types</h6>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::collections::BTreeSet;
+
+<span class="kw">use </span>rootcause::{prelude::<span class="kw-2">*</span>, report_collection::ReportCollection};
+
+<span class="kw">let </span>inputs = <span class="macro">vec!</span>[<span class="string">"1"</span>, <span class="string">"2"</span>, <span class="string">"foo"</span>, <span class="string">"4"</span>, <span class="string">"bar"</span>];
+<span class="kw">let </span>result: <span class="prelude-ty">Result</span>&lt;BTreeSet&lt;u8&gt;, ReportCollection&lt;std::num::ParseIntError&gt;&gt; = inputs
+    .into_iter()
+    .map(|s| s.parse::&lt;u8&gt;())
+    .collect_reports();
+
+<span class="comment">// All errors were collected
+</span><span class="macro">assert!</span>(result.is_err());
+<span class="kw">let </span>errors = result.unwrap_err();
+<span class="macro">assert_eq!</span>(errors.len(), <span class="number">2</span>); <span class="comment">// "foo" and "bar" both failed</span></code></pre></div><h6 id="all-successful-items"><a class="doc-anchor" href="#all-successful-items">§</a>All Successful Items</h6>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::collections::BTreeSet;
+
+<span class="kw">use </span>rootcause::{prelude::<span class="kw-2">*</span>, report_collection::ReportCollection};
+
+<span class="kw">let </span>inputs = <span class="macro">vec!</span>[<span class="string">"1"</span>, <span class="string">"2"</span>, <span class="string">"2"</span>];
+<span class="kw">let </span>result: <span class="prelude-ty">Result</span>&lt;BTreeSet&lt;u8&gt;, ReportCollection&lt;std::num::ParseIntError&gt;&gt; = inputs
+    .into_iter()
+    .map(|s| s.parse::&lt;u8&gt;())
+    .collect_reports();
+
+<span class="macro">assert!</span>(result.is_ok());
+<span class="kw">let </span>values = result.unwrap();
+<span class="macro">assert_eq!</span>(values, BTreeSet::from([<span class="number">1u8</span>, <span class="number">2</span>]));</code></pre></div></div></details><details class="toggle method-toggle" open><summary><section id="tymethod.collect_reports_vec" class="method"><a class="src rightside" href="../../src/rootcause/iterator_ext.rs.html#151-155">Source</a><h4 class="code-header">fn <a href="#tymethod.collect_reports_vec" class="fn">collect_reports_vec</a>&lt;ThreadSafety&gt;(
+    self,
+) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/1.91.1/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;A&gt;, <a class="struct" href="../report_collection/struct.ReportCollection.html" title="struct rootcause::report_collection::ReportCollection">ReportCollection</a>&lt;E::<a class="associatedtype" href="../trait.IntoReport.html#associatedtype.Context" title="type rootcause::IntoReport::Context">Context</a>, ThreadSafety&gt;&gt;<div class="where">where
+    E: <a class="trait" href="../trait.IntoReport.html" title="trait rootcause::IntoReport">IntoReport</a>&lt;ThreadSafety&gt;,</div></h4></section></summary><div class="docblock"><p>Collects successful values into a <code>Vec</code>, or all errors into a
+<a href="../report_collection/struct.ReportCollection.html" title="struct rootcause::report_collection::ReportCollection"><code>ReportCollection</code></a>.</p>
+<p>This is a specialized version of
+<a href="trait.IteratorExt.html#tymethod.collect_reports" title="method rootcause::prelude::IteratorExt::collect_reports"><code>collect_reports</code></a> that always
+collects into a <code>Vec</code>. It may help with type inference and could
+generate slightly more optimized code.</p>
+<h5 id="when-to-use-1"><a class="doc-anchor" href="#when-to-use-1">§</a>When to Use</h5>
+<p>Use this method instead of
+<a href="trait.IteratorExt.html#tymethod.collect_reports" title="method rootcause::prelude::IteratorExt::collect_reports"><code>collect_reports</code></a> when:</p>
+<ul>
+<li>You’re collecting into a <code>Vec</code> and want simpler type annotations</li>
+<li>You’re in performance-critical code and want potential optimization</li>
+<li>Type inference is having trouble with the generic container parameter</li>
+</ul>
+<h5 id="returns-1"><a class="doc-anchor" href="#returns-1">§</a>Returns</h5>
+<ul>
+<li><code>Ok(Vec&lt;A&gt;)</code>: If all items were successful</li>
+<li><code>Err(ReportCollection)</code>: If any errors occurred, containing all of
+them</li>
+</ul>
+<h5 id="examples-1"><a class="doc-anchor" href="#examples-1">§</a>Examples</h5>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>rootcause::{prelude::<span class="kw-2">*</span>, report_collection::ReportCollection};
+
+<span class="kw">let </span>inputs = <span class="macro">vec!</span>[<span class="string">"1"</span>, <span class="string">"2"</span>, <span class="string">"foo"</span>, <span class="string">"2"</span>, <span class="string">"bar"</span>];
+<span class="kw">let </span>result: <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, ReportCollection&lt;std::num::ParseIntError&gt;&gt; = inputs
+    .into_iter()
+    .map(|s| s.parse::&lt;u8&gt;())
+    .collect_reports_vec();
+
+<span class="macro">assert!</span>(result.is_err());
+<span class="kw">let </span>errors = result.unwrap_err();
+<span class="macro">assert_eq!</span>(errors.len(), <span class="number">2</span>); <span class="comment">// Both "foo" and "bar" failed</span></code></pre></div></div></details></div><h2 id="dyn-compatibility" class="section-header">Dyn Compatibility<a href="#dyn-compatibility" class="anchor">§</a></h2><div class="dyn-compatibility-info"><p>This trait is <b>not</b> <a href="https://doc.rust-lang.org/1.91.1/reference/items/traits.html#dyn-compatibility">dyn compatible</a>.</p><p><i>In older versions of Rust, dyn compatibility was called "object safety", so this trait is not object safe.</i></p></div><h2 id="implementors" class="section-header">Implementors<a href="#implementors" class="anchor">§</a></h2><div id="implementors-list"><section id="impl-IteratorExt%3CA,+E%3E-for-I" class="impl"><a class="src rightside" href="../../src/rootcause/iterator_ext.rs.html#213-262">Source</a><a href="#impl-IteratorExt%3CA,+E%3E-for-I" class="anchor">§</a><h3 class="code-header">impl&lt;A, E, I&gt; <a class="trait" href="trait.IteratorExt.html" title="trait rootcause::prelude::IteratorExt">IteratorExt</a>&lt;A, E&gt; for I<div class="where">where
+    I: <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/iter/traits/iterator/trait.Iterator.html" title="trait core::iter::traits::iterator::Iterator">Iterator</a>&lt;Item = <a class="enum" href="https://doc.rust-lang.org/1.91.1/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;A, E&gt;&gt;,</div></h3></section></div><script src="../../trait.impl/rootcause/iterator_ext/trait.IteratorExt.js" async></script></section></div></main></body></html>

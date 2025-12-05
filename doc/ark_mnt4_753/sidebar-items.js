@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["fq","fr"],"struct":["FqConfig","FrConfig"],"type":["Fq","Fr"]};

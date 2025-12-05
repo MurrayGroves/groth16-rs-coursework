@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["AttachmentFormattingPlacement","FormattingFunction"],"struct":["AttachmentFormattingStyle","ContextFormattingStyle"],"trait":["AttachmentHandler","ContextHandler"]};

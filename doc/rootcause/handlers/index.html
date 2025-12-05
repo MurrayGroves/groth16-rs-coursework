@@ -1,0 +1,75 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Handlers that control how errors and attachments are formatted and displayed."><title>rootcause::handlers - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-e56847b5.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rootcause" data-themes="" data-resource-suffix="" data-rustdoc-version="1.91.1 (ed61e7d7e 2025-11-07)" data-channel="1.91.1" data-search-js="search-e256b49e.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../static.files/storage-e2aeef58.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../static.files/main-6dc2a7f3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">Module handlers</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../rootcause/index.html">rootcause</a><span class="version">0.10.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Module handlers</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#what-are-handlers" title="What Are Handlers?">What Are Handlers?</a></li><li><a href="#formatting-behavior" title="Formatting Behavior">Formatting Behavior</a><ul><li><a href="#1-formatting-function-selection" title="1. Formatting Function Selection">1. Formatting Function Selection</a></li><li><a href="#2-attachment-placement" title="2. Attachment Placement">2. Attachment Placement</a></li></ul></li><li><a href="#built-in-handlers" title="Built-in Handlers">Built-in Handlers</a><ul><li><a href="#error" title="`Error`"><code>Error</code></a></li><li><a href="#display" title="`Display`"><code>Display</code></a></li><li><a href="#structdebug" title="`struct@Debug`"><code>struct@Debug</code></a></li><li><a href="#any" title="`Any`"><code>Any</code></a></li></ul></li><li><a href="#when-handlers-are-selected" title="When Handlers Are Selected">When Handlers Are Selected</a></li><li><a href="#examples" title="Examples">Examples</a></li></ul><h3><a href="#structs">Module Items</a></h3><ul class="block"><li><a href="#structs" title="Structs">Structs</a></li><li><a href="#enums" title="Enums">Enums</a></li><li><a href="#traits" title="Traits">Traits</a></li></ul></section><div id="rustdoc-modnav"><h2 class="in-crate"><a href="../index.html">In crate rootcause</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../index.html">rootcause</a></div><h1>Module <span>handlers</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../src/rootcause/handlers.rs.html#1-373">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Handlers that control how errors and attachments are formatted and
+displayed.</p>
+<p>Handlers determine how context objects and attachments are formatted when
+displaying or debugging error reports. The rootcause library provides
+several built-in handlers that cover common use cases.</p>
+<h2 id="what-are-handlers"><a class="doc-anchor" href="#what-are-handlers">§</a>What Are Handlers?</h2>
+<p>Handlers are types that implement the <a href="trait.ContextHandler.html" title="trait rootcause::handlers::ContextHandler"><code>ContextHandler</code></a> and/or
+<a href="trait.AttachmentHandler.html" title="trait rootcause::handlers::AttachmentHandler"><code>AttachmentHandler</code></a> traits. They define how to format your error contexts
+and attachments, including:</p>
+<ul>
+<li>How to display an error context (via <a href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Display.html" title="trait core::fmt::Display"><code>Display</code></a>)</li>
+<li>How to debug-format an error context (via <a href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug"><code>Debug</code></a>)</li>
+<li>How to navigate to the error’s source (via
+<a href="https://doc.rust-lang.org/1.91.1/core/error/trait.Error.html#method.source" title="method core::error::Error::source"><code>Error::source</code></a>)</li>
+<li>How to format attachments when they appear in reports</li>
+<li>Formatting preferences (inline vs appendix, display vs debug)</li>
+</ul>
+<h2 id="formatting-behavior"><a class="doc-anchor" href="#formatting-behavior">§</a>Formatting Behavior</h2>
+<p>Handlers can control two aspects of formatting:</p>
+<h3 id="1-formatting-function-selection"><a class="doc-anchor" href="#1-formatting-function-selection">§</a>1. Formatting Function Selection</h3>
+<p>The <a href="trait.ContextHandler.html#method.preferred_formatting_style" title="associated function rootcause::handlers::ContextHandler::preferred_formatting_style"><code>ContextHandler::preferred_formatting_style</code></a> and
+<a href="trait.AttachmentHandler.html#method.preferred_formatting_style" title="associated function rootcause::handlers::AttachmentHandler::preferred_formatting_style"><code>AttachmentHandler::preferred_formatting_style</code></a> methods allow handlers to
+specify whether they prefer <a href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Display.html" title="trait core::fmt::Display"><code>Display</code></a> or
+<a href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug"><code>Debug</code></a> formatting when shown in a report. The default
+behavior is to always use <code>Display</code> formatting, regardless of how the report
+itself is being formatted.</p>
+<p>All built-in handlers (<a href="struct.Error.html" title="struct rootcause::handlers::Error"><code>Error</code></a>, <a href="struct.Display.html" title="struct rootcause::handlers::Display"><code>Display</code></a>, <a href="struct.Debug.html" title="struct rootcause::handlers::Debug"><code>Debug</code></a>, <a href="struct.Any.html" title="struct rootcause::handlers::Any"><code>Any</code></a>)
+use this default behavior, which means they use their <code>display</code> method even
+when the report is being debug-formatted with <code>{:?}</code>.</p>
+<h3 id="2-attachment-placement"><a class="doc-anchor" href="#2-attachment-placement">§</a>2. Attachment Placement</h3>
+<p>For attachments, handlers can also specify placement preferences via
+<a href="struct.AttachmentFormattingStyle.html" title="struct rootcause::handlers::AttachmentFormattingStyle"><code>AttachmentFormattingStyle</code></a>:</p>
+<ul>
+<li><strong>Inline</strong>: Rendered directly in the error chain</li>
+<li><strong>InlineWithHeader</strong>: Rendered inline but with a header (for multi-line
+content)</li>
+<li><strong>Appendix</strong>: Rendered in a separate appendix section</li>
+<li><strong>Opaque</strong>: Not shown, but counted in a summary</li>
+<li><strong>Hidden</strong>: Not shown at all</li>
+</ul>
+<h2 id="built-in-handlers"><a class="doc-anchor" href="#built-in-handlers">§</a>Built-in Handlers</h2><h3 id="error"><a class="doc-anchor" href="#error">§</a><a href="struct.Error.html" title="struct rootcause::handlers::Error"><code>Error</code></a></h3>
+<p>For types implementing <a href="https://doc.rust-lang.org/1.91.1/core/error/trait.Error.html" title="trait core::error::Error"><code>std::error::Error</code></a>. Delegates
+to the type’s <code>Display</code>, <code>Debug</code>, and <code>source</code> implementations. This is the
+default handler for error types.</p>
+<h3 id="display"><a class="doc-anchor" href="#display">§</a><a href="struct.Display.html" title="struct rootcause::handlers::Display"><code>Display</code></a></h3>
+<p>For types implementing <a href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Display.html" title="trait core::fmt::Display"><code>Display</code></a> and
+<a href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug"><code>Debug</code></a>. Useful for custom context types that aren’t
+errors. Always returns <code>None</code> for <code>source</code>.</p>
+<h3 id="structdebug"><a class="doc-anchor" href="#structdebug">§</a><a href="struct.Debug.html" title="struct rootcause::handlers::Debug"><code>Debug</code></a></h3>
+<p>For types implementing <a href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug"><code>Debug</code></a>. Uses debug formatting
+for the <code>debug</code> method and shows “Context of type <code>TypeName</code>” for the
+<code>display</code> method. Useful for types that don’t implement <code>Display</code>.</p>
+<h3 id="any"><a class="doc-anchor" href="#any">§</a><a href="struct.Any.html" title="struct rootcause::handlers::Any"><code>Any</code></a></h3>
+<p>For any type. Shows “An object of type TypeName” for both <code>display</code> and
+<code>debug</code>. Used when no other formatting is available.</p>
+<h2 id="when-handlers-are-selected"><a class="doc-anchor" href="#when-handlers-are-selected">§</a>When Handlers Are Selected</h2>
+<p>Handlers are typically selected automatically by the
+<a href="../macro.report.html" title="macro rootcause::report"><code>report!</code></a> macro based on the traits implemented by your
+context type. You can also specify a handler explicitly using
+<a href="../struct.Report.html#method.new_custom" title="associated function rootcause::Report::new_custom"><code>Report::new_custom</code></a>.</p>
+<h2 id="examples"><a class="doc-anchor" href="#examples">§</a>Examples</h2>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>std::io;
+
+<span class="kw">use </span>rootcause::prelude::<span class="kw-2">*</span>;
+
+<span class="comment">// Error handler (automatic for std::error::Error types)
+</span><span class="kw">let </span>io_err: io::Error = io::Error::new(io::ErrorKind::NotFound, <span class="string">"file.txt"</span>);
+<span class="kw">let </span>report: Report&lt;io::Error&gt; = <span class="macro">report!</span>(io_err);
+
+<span class="comment">// Display handler (automatic for Display + Debug types)
+</span><span class="kw">let </span>msg: String = <span class="string">"Configuration invalid"</span>.to_string();
+<span class="kw">let </span>report2: Report&lt;String&gt; = <span class="macro">report!</span>(msg);</code></pre></div></div></details><h2 id="structs" class="section-header">Structs<a href="#structs" class="anchor">§</a></h2><dl class="item-table"><dt><a class="struct" href="struct.Any.html" title="struct rootcause::handlers::Any">Any</a></dt><dd>Handler for any type, regardless of implemented traits.</dd><dt><a class="struct" href="struct.AttachmentFormattingStyle.html" title="struct rootcause::handlers::AttachmentFormattingStyle">Attachment<wbr>Formatting<wbr>Style</a></dt><dd>Formatting preferences for an attachment when displayed in a report.</dd><dt><a class="struct" href="struct.ContextFormattingStyle.html" title="struct rootcause::handlers::ContextFormattingStyle">Context<wbr>Formatting<wbr>Style</a></dt><dd>Formatting preferences for a context when displayed in a report.</dd><dt><a class="struct" href="struct.Debug.html" title="struct rootcause::handlers::Debug">Debug</a></dt><dd>Handler for types implementing <a href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug"><code>Debug</code></a>.</dd><dt><a class="struct" href="struct.Display.html" title="struct rootcause::handlers::Display">Display</a></dt><dd>Handler for types implementing <a href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Display.html" title="trait core::fmt::Display"><code>Display</code></a> and
+<a href="https://doc.rust-lang.org/1.91.1/core/fmt/trait.Debug.html" title="trait core::fmt::Debug"><code>Debug</code></a>.</dd><dt><a class="struct" href="struct.Error.html" title="struct rootcause::handlers::Error">Error</a></dt><dd>Handler for types implementing <a href="https://doc.rust-lang.org/1.91.1/core/error/trait.Error.html" title="trait core::error::Error"><code>std::error::Error</code></a>.</dd></dl><h2 id="enums" class="section-header">Enums<a href="#enums" class="anchor">§</a></h2><dl class="item-table"><dt><a class="enum" href="enum.AttachmentFormattingPlacement.html" title="enum rootcause::handlers::AttachmentFormattingPlacement">Attachment<wbr>Formatting<wbr>Placement</a></dt><dd>Specifies where an attachment should be placed when displayed in a report.</dd><dt><a class="enum" href="enum.FormattingFunction.html" title="enum rootcause::handlers::FormattingFunction">Formatting<wbr>Function</a></dt><dd>Specifies whether to use display or debug formatting for a context or
+attachment.</dd></dl><h2 id="traits" class="section-header">Traits<a href="#traits" class="anchor">§</a></h2><dl class="item-table"><dt><a class="trait" href="trait.AttachmentHandler.html" title="trait rootcause::handlers::AttachmentHandler">Attachment<wbr>Handler</a></dt><dd>Trait for implementing custom formatting behavior for report attachments.</dd><dt><a class="trait" href="trait.ContextHandler.html" title="trait rootcause::handlers::ContextHandler">Context<wbr>Handler</a></dt><dd>Trait for implementing custom formatting and error-chaining behavior for
+report contexts.</dd></dl></section></div></main></body></html>

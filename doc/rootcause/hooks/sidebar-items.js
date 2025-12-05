@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["builtin_hooks","formatting_overrides","report_creation","report_formatting"]};

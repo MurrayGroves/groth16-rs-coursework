@@ -2,7 +2,7 @@ use ark_ec::CurveGroup;
 use ark_ff::Field;
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use ark_std::iterable::Iterable;
-use log::{debug, trace};
+use log::trace;
 use rootcause::prelude::ResultExt;
 use rootcause::{Report, bail, report};
 use serde::{Deserialize, Serialize};
@@ -11,6 +11,8 @@ use std::fmt::Debug;
 use std::iter::{Sum, zip};
 use std::ops::{Add, AddAssign, Div, Mul, MulAssign, Sub, SubAssign};
 
+/// Represents a polynomial over a finite field. Supports scalar and polynomial addition, subtraction, multiplication, division.
+/// Can be generated via Lagrangian interpolation over a vector.
 #[derive(
     Clone, PartialEq, Eq, Debug, Serialize, Deserialize, CanonicalSerialize, CanonicalDeserialize,
 )]
@@ -23,6 +25,7 @@ where
 }
 
 impl<F: Field> Polynomial<F> {
+    /// Evaluate the polynomial over an SRS to get the `y` value without knowing `x`.
     pub fn evaluate_over_srs<T>(&self, srs: &Vec<T>) -> Result<T, Report>
     where
         T: MulAssign<F> + CurveGroup + Debug,
@@ -32,7 +35,7 @@ impl<F: Field> Polynomial<F> {
                 .attach(format!(
                     "SRS degree: {:?} (supports polynomial of degree {:?})",
                     srs.len(),
-                    srs.len() - 1
+                    srs.len().checked_sub(1)
                 ))
                 .attach(format!("Polynomial degree: {:?}", self.degree())));
         }
@@ -45,16 +48,17 @@ impl<F: Field> Polynomial<F> {
                 result *= *coefficient;
                 result
             })
-            .reduce(std::ops::Add::add)
+            .reduce(Add::add)
             .ok_or(report!("Polynomial has no coefficients"))
     }
 
-    pub fn evaluate(&self, tau: &F) -> F {
+    /// Evaluate polynomial at some point `x`.
+    pub fn evaluate(&self, x: &F) -> F {
         self.coefficients
             .iter()
             .enumerate()
-            .map(|(degree, coefficient)| *coefficient * tau.pow([degree as u64]))
-            .reduce(std::ops::Add::add)
+            .map(|(degree, coefficient)| *coefficient * x.pow([degree as u64]))
+            .reduce(Add::add)
             .unwrap_or(F::default())
     }
     pub fn degree(&self) -> usize {
@@ -65,7 +69,7 @@ impl<F: Field> Polynomial<F> {
         self.coefficients.len() == 0 || self.coefficients.iter().all(|x| *x == F::default())
     }
 
-    pub fn lead(&self) -> Polynomial<F> {
+    fn lead(&self) -> Polynomial<F> {
         Polynomial {
             coefficients: self
                 .coefficients
@@ -82,7 +86,7 @@ impl<F: Field> Polynomial<F> {
         }
     }
 
-    pub fn is_lead(&self) -> bool {
+    fn is_lead(&self) -> bool {
         self.coefficients
             .iter()
             .rev()
@@ -90,11 +94,18 @@ impl<F: Field> Polynomial<F> {
             .all(|x| *x == F::default())
     }
 
+    /// Create from a vector of coefficients in ascending degree order x^0, x^1, etc
     pub fn new(vec: Vec<F>) -> Self {
         Polynomial { coefficients: vec }
     }
 
-    /// Find a polynomial by doing Lagrange interpolation over a vector
+    /// Find a polynomial by doing Lagrange interpolation over a vector,
+    /// where the `x` coordinate is taken to be the index of the element in the vector plus one.
+    /// # Examples
+    /// ```
+    /// // Interpolates the set of points [(1,3), (2,10), (3,11)]
+    /// interpolate_from_vector(vec![3, 10, 11])
+    /// ```
     pub fn interpolate_from_vector(vec: &Vec<F>) -> Self {
         vec.iter()
             .enumerate()
@@ -120,7 +131,7 @@ impl<F: Field> Polynomial<F> {
                                 Some(x - F::from(x_i as u128))
                             }
                         })
-                        .reduce(std::ops::Mul::mul)
+                        .reduce(Mul::mul)
                         .unwrap_or(F::from(1)))
                     * *y
             })
@@ -244,7 +255,6 @@ impl<F: Field> Mul for &Polynomial<F> {
         }
 
         // n^2 approach from https://home.cse.ust.hk/~dekai/271/notes/L03/L03.pdf page 4.
-        // TODO - Use n log n algorithm with FFT
         let mut out = vec![F::default(); 1 + a.degree() + b.degree()]; // +1 for constant
         for k in 0..out.len() {
             let mut coefficient = F::default();
@@ -310,17 +320,10 @@ impl<F: Field> Div for Polynomial<F> {
                 .attach(format!("RHS: {:?}", rhs.lead()))?;
             quotient += tmp.clone();
             remainder -= &tmp * &rhs;
-            trace!(
-                "Quotient: {:?}\nRemainder: {:?}\nTmp: {:?}",
-                quotient, remainder, tmp
-            );
+            trace!("Q: {:?}\nR: {:?}\nTmp: {:?}", quotient, remainder, tmp);
         }
 
-        if !remainder.is_zero() {
-            Err(report!("Non zero remainder").attach(format!("Remainder: {:?}", remainder)))
-        } else {
-            Ok(quotient)
-        }
+        Ok(quotient)
     }
 }
 
@@ -354,6 +357,8 @@ impl<F: Field> Sum for Polynomial<F> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use ark_ec::pairing::Pairing;
+    use ark_mnt6_753::MNT6_753;
     use log::debug;
     use rand::{Rng, RngCore};
 
@@ -394,6 +399,17 @@ mod tests {
         let a = Polynomial::<Field>::new(vec![]);
         let b = Polynomial::from(vec![0, 0, 10]);
         assert_eq!(&a + &b, b);
+
+        let a = Polynomial {
+            coefficients: vec![Field::from(1)],
+        };
+        let b = Polynomial {
+            coefficients: vec![Field::from(10), Field::from(2)],
+        };
+        let c = Polynomial {
+            coefficients: vec![Field::from(-9), Field::from(-2)],
+        };
+        assert_eq!(&a - &b, c);
     }
 
     #[test]
@@ -456,6 +472,19 @@ mod tests {
         let b = Polynomial::from(vec![3, 5, 10]);
         let c = &a * &b;
         assert_eq!((c / b)?, a);
+
+        let b: Polynomial<Field> = Polynomial::from(vec![0, 0, 0]);
+        assert!((a / b).is_err());
+
         Ok(())
+    }
+
+    #[test]
+    fn small_srs_errors() {
+        let srs: Vec<<MNT6_753 as Pairing>::G1> = vec![];
+        let poly = Polynomial::<Field>::from(vec![1, 2, 3, 4, 5]);
+
+        let evaluation = poly.evaluate_over_srs(&srs);
+        assert!(evaluation.is_err())
     }
 }

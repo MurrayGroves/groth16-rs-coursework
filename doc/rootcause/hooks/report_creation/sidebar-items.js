@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["register_attachment_collector_hook","register_report_creation_hook"],"trait":["AttachmentCollectorHook","ReportCreationHook"]};

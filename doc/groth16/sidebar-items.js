@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["circuits","groth16","polynomial"]};

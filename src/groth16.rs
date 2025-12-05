@@ -1,10 +1,9 @@
 use crate::circuits::QAP;
-use crate::helpers::rand_scalar;
+use crate::helpers::{ark_de, ark_se, rand_scalar};
 use crate::polynomial::Polynomial;
 use ark_ec::PrimeGroup;
 use ark_ec::pairing::Pairing;
 use ark_ff::fields::Field;
-use ark_serialize::{CanonicalDeserialize, CanonicalSerialize, Compress, Validate};
 use itertools::izip;
 use log::debug;
 use rand::SeedableRng;
@@ -13,17 +12,23 @@ use rootcause::{Report, bail, report};
 use serde::{Deserialize, Serialize};
 use std::iter::zip;
 
-#[derive(Deserialize, Serialize)]
-struct Proof<C: Pairing> {
+/// A proof for a witness over some trusted setup. Can be verified with method `verify`.
+#[derive(Deserialize, Serialize, Debug, Eq, PartialEq)]
+pub struct Proof<C: Pairing> {
+    #[serde(serialize_with = "ark_se", deserialize_with = "ark_de")]
     a: C::G1,
+    #[serde(serialize_with = "ark_se", deserialize_with = "ark_de")]
     b: C::G2,
+    #[serde(serialize_with = "ark_se", deserialize_with = "ark_de")]
     c: C::G1,
 }
 
 impl<C: Pairing> Proof<C> {
+    /// Verify the proof is valid for a given trusted setup and public witness.
+    /// Returns `true` if the proof is valid, `false` otherwise.
     pub fn verify(
         &self,
-        trusted_setup: TrustedSetupOutput<C>,
+        trusted_setup: &TrustedSetupOutput<C>,
         public_witness: &Vec<C::ScalarField>,
     ) -> bool {
         debug!("Verifying with public witness: {:?}", public_witness);
@@ -51,39 +56,30 @@ impl<C: Pairing> Proof<C> {
     }
 }
 
-fn ark_se<S, A: CanonicalSerialize>(a: &A, s: S) -> Result<S::Ok, S::Error>
-where
-    S: serde::Serializer,
-{
-    // ark_se and ark_de taken from https://github.com/arkworks-rs/algebra/issues/178#issuecomment-1413219278
-    let mut bytes = vec![];
-    a.serialize_with_mode(&mut bytes, Compress::Yes)
-        .map_err(serde::ser::Error::custom)?;
-    s.serialize_bytes(&bytes)
-}
-
-fn ark_de<'de, D, A: CanonicalDeserialize>(data: D) -> Result<A, D::Error>
-where
-    D: serde::de::Deserializer<'de>,
-{
-    let s: Vec<u8> = serde::de::Deserialize::deserialize(data)?;
-    let a = A::deserialize_with_mode(s.as_slice(), Compress::Yes, Validate::Yes);
-    a.map_err(serde::de::Error::custom)
-}
-
-#[derive(Serialize, Deserialize)]
-struct TrustedSetupOutput<C: Pairing> {
+/// A trusted setup for a given QAP. Should be instantiated once and shared in serialized form to all parties that wish to generate proofs for the QAP.
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq)]
+pub struct TrustedSetupOutput<C: Pairing> {
     #[serde(serialize_with = "ark_se", deserialize_with = "ark_de")]
     qap: QAP<C::ScalarField>,
+    #[serde(serialize_with = "ark_se", deserialize_with = "ark_de")]
     alpha: C::G1,
+    #[serde(serialize_with = "ark_se", deserialize_with = "ark_de")]
     beta_1: C::G1,
+    #[serde(serialize_with = "ark_se", deserialize_with = "ark_de")]
     beta_2: C::G2,
+    #[serde(serialize_with = "ark_se", deserialize_with = "ark_de")]
     gamma: C::G2,
+    #[serde(serialize_with = "ark_se", deserialize_with = "ark_de")]
     delta_1: C::G1,
+    #[serde(serialize_with = "ark_se", deserialize_with = "ark_de")]
     delta_2: C::G2,
+    #[serde(serialize_with = "ark_se", deserialize_with = "ark_de")]
     group_1_srs: Vec<C::G1>,
+    #[serde(serialize_with = "ark_se", deserialize_with = "ark_de")]
     group_2_srs: Vec<C::G2>,
+    #[serde(serialize_with = "ark_se", deserialize_with = "ark_de")]
     zero_polynomial_srs: Vec<C::G1>,
+    #[serde(serialize_with = "ark_se", deserialize_with = "ark_de")]
     psi_polynomials: Vec<C::G1>,
 }
 
@@ -158,14 +154,14 @@ impl<C: Pairing> TrustedSetupOutput<C> {
                     delta
                 };
 
-                Ok(
-                    (&((v_i * alpha) + (u_i * beta)) + w_i).evaluate_over_srs(&group_1_srs)?
-                        * (C::ScalarField::from(1) / divisor),
-                )
+                let numerator_poly = &((v_i * alpha) + (u_i * beta)) + w_i;
+                Ok(numerator_poly.evaluate_over_srs(&group_1_srs)?
+                    * (C::ScalarField::from(1) / divisor))
             })
             .collect::<Result<Vec<_>, Report>>()
     }
 
+    /// Run a new trusted setup for a given QAP.
     pub fn new(qap: QAP<C::ScalarField>) -> Result<TrustedSetupOutput<C>, Report> {
         debug!("Starting trusted setup");
         let mut rng = rand::rngs::StdRng::from_os_rng();
@@ -195,7 +191,8 @@ impl<C: Pairing> TrustedSetupOutput<C> {
 
         debug!("Generated zero polynomial srs");
 
-        let psi_polynomials = Self::psi_polynomials(&qap, &group_1_srs, alpha, beta, gamma, delta)?;
+        let psi_polynomials = Self::psi_polynomials(&qap, &group_1_srs, alpha, beta, gamma, delta)
+            .context("Generating psi polynomials")?;
 
         debug!("Generated psi polynomials");
 
@@ -224,69 +221,69 @@ impl<C: Pairing> TrustedSetupOutput<C> {
             zip(&self.qap.v, witness).map(|(v_i, a_i)| v_i * *a_i).sum();
         let aw_sum: Polynomial<C::ScalarField> =
             zip(&self.qap.w, witness).map(|(w_i, a_i)| w_i * *a_i).sum();
-        Ok(((&(au_sum * av_sum) - &aw_sum) / Self::t(self.qap.degree())?)?)
+        Ok(
+            ((&(au_sum * av_sum) - &aw_sum)
+                / Self::t(self.qap.degree()).context("Generating t")?)
+            .context("Dividing u(x)*v(x) - w(x) by t to find h")?,
+        )
     }
 
     fn evaluate_u(&self, witness: &Vec<C::ScalarField>) -> Result<C::G1, Report> {
-        if witness.len() != self.qap.u.len() {
-            bail!("Witness wrong size for QAP")
-        }
         let evaluated_u = self
             .qap
             .u
             .iter()
             .map(|x| x.evaluate_over_srs(&self.group_1_srs))
-            .collect::<Result<Vec<_>, Report>>()?;
+            .collect::<Result<Vec<_>, Report>>()
+            .context("Evaluating u(x) over SRS")?;
 
         Ok(zip(evaluated_u, witness)
             .map(|(p, a_i)| p * a_i)
             .collect::<Vec<_>>()
             .into_iter()
             .reduce(std::ops::Add::add)
-            .ok_or(report!("Empty witness"))?)
+            .ok_or(report!("Empty witness"))
+            .context("Multiplying u(x) by witness")?)
     }
 
     fn evaluate_v(&self, witness: &Vec<C::ScalarField>) -> Result<C::G2, Report> {
-        if witness.len() != self.qap.v.len() {
-            bail!("Witness wrong size for QAP")
-        }
         let evaluated_v = self
             .qap
             .v
             .iter()
             .map(|x| x.evaluate_over_srs(&self.group_2_srs))
-            .collect::<Result<Vec<_>, Report>>()?;
+            .collect::<Result<Vec<_>, Report>>()
+            .context("Evaluating v(x) over group 2 SRS")?;
 
         Ok(zip(evaluated_v, witness)
             .map(|(p, a_i)| p * a_i)
             .collect::<Vec<_>>()
             .into_iter()
             .reduce(std::ops::Add::add)
-            .ok_or(report!("Empty witness"))?)
+            .ok_or(report!("Empty witness"))
+            .context("Multiplying v(x) by witness")?)
     }
 
     fn evaluate_v_1(&self, witness: &Vec<C::ScalarField>) -> Result<C::G1, Report> {
-        if witness.len() != self.qap.v.len() {
-            bail!("Witness wrong size for QAP")
-        }
         let evaluated_v = self
             .qap
             .v
             .iter()
             .map(|x| x.evaluate_over_srs(&self.group_1_srs))
-            .collect::<Result<Vec<_>, Report>>()?;
+            .collect::<Result<Vec<_>, Report>>()
+            .context("Evaluating v(x) over group 1 SRS")?;
 
         Ok(zip(evaluated_v, witness)
             .map(|(p, a_i)| p * a_i)
             .collect::<Vec<_>>()
             .into_iter()
             .reduce(std::ops::Add::add)
-            .ok_or(report!("Empty witness"))?)
+            .ok_or(report!("Empty witness"))
+            .context("Multiplying v(x) by witness")?)
     }
+
+    /// Only used in tests, full algorithm uses psi polynomials instead of evaluating w over an SRS.
     fn evaluate_w(&self, witness: &Vec<C::ScalarField>) -> Result<C::G1, Report> {
-        if witness.len() != self.qap.w.len() {
-            bail!("Witness wrong size for QAP")
-        }
         let evaluated_w = self
             .qap
             .w
@@ -302,26 +299,48 @@ impl<C: Pairing> TrustedSetupOutput<C> {
             .ok_or(report!("Empty witness"))?)
     }
 
-    fn prove(&self, witness: &Vec<C::ScalarField>) -> Result<Proof<C>, Report> {
+    pub fn prove(&self, witness: &Vec<C::ScalarField>) -> Result<Proof<C>, Report> {
+        if witness.len() != self.qap.u.len()
+            || witness.len() != self.qap.v.len()
+            || witness.len() != self.qap.w.len()
+        {
+            bail!("Witness incorrect length!");
+        }
+
         let mut rng = rand::rngs::StdRng::from_os_rng();
 
         let r: C::ScalarField = rand_scalar(&mut rng);
         let s: C::ScalarField = rand_scalar(&mut rng);
 
-        let a = self.alpha + self.evaluate_u(witness)? + (self.delta_1 * r);
+        let a = self.alpha
+            + self.evaluate_u(witness).context("Evaluating a*u(x)")?
+            + (self.delta_1 * r);
 
-        let b_2 = self.beta_2 + self.evaluate_v(witness)? + (self.delta_2 * s);
+        let b_2 = self.beta_2
+            + self
+                .evaluate_v(witness)
+                .context("Evaluating a*v(x) in group 2")?
+            + (self.delta_2 * s);
 
-        let b_1 = self.beta_1 + self.evaluate_v_1(witness)? + (self.delta_1 * s);
+        let b_1 = self.beta_1
+            + self
+                .evaluate_v_1(witness)
+                .context("Evaluating a*v(x) in group 1")?
+            + (self.delta_1 * s);
 
-        let ht = self.calculate_zero_polynomial(witness)?;
-        let ht_tau = ht.evaluate_over_srs(&self.zero_polynomial_srs)?;
+        let ht = self
+            .calculate_zero_polynomial(witness)
+            .context("Calculating zero polynomial")?;
+        let ht_tau = ht
+            .evaluate_over_srs(&self.zero_polynomial_srs)
+            .context("Evaluating zero polynomial at tau")?;
 
         let c = zip(&self.psi_polynomials, witness)
             .skip(self.qap.public_witness.len())
             .map(|(psi, a_i)| *psi * a_i)
             .reduce(std::ops::Add::add)
-            .ok_or(report!("Empty witness"))?
+            .ok_or(report!("Empty witness"))
+            .context("Multiplying witness by psi polynomials")?
             + ht_tau
             + (a * s)
             + (b_1 * r)
@@ -351,10 +370,8 @@ mod tests {
     }
 
     type Field = ark_mnt6_753::Fr;
-    #[test]
-    fn groth16() -> Result<(), Report> {
-        init();
 
+    fn r1cs_matrices() -> (Vec<Vec<i32>>, Vec<Vec<i32>>, Vec<Vec<i32>>) {
         let l = vec![
             vec![0, 0, 0],
             vec![0, 0, 0],
@@ -388,8 +405,17 @@ mod tests {
             vec![0, 1, 0],
         ];
 
+        (l, r, o)
+    }
+
+    #[test]
+    fn groth16() -> Result<(), Report> {
+        init();
+
+        let (l, r, o) = r1cs_matrices();
+
         debug!("Matrices initialised");
-        let r1cs: R1CS<Field> = R1CS::new(l, r, o, Vec::new());
+        let r1cs: R1CS<Field> = R1CS::new(l, r, o, Vec::<i32>::new());
 
         debug!("R1CS initialised: {:?}", r1cs);
         let qap = QAP::from(r1cs.clone());
@@ -412,11 +438,86 @@ mod tests {
         debug!("Generating proof for witness {:?}", w);
         assert_eq!(r, x * y * z * u);
         assert!(r1cs.verify(&w)?);
-        assert!(qap.verify(&w)?);
+        assert!(qap.verify(&w));
         let proof = trusted_setup.prove(&w)?;
 
         debug!("Proof generated");
-        assert!(proof.verify(trusted_setup, &qap.public_witness));
+        assert!(proof.verify(&trusted_setup, &qap.public_witness));
+        Ok(())
+    }
+    #[test]
+    fn invalid_witness_length_errors() -> Result<(), Report> {
+        init();
+
+        let (l, r, o) = r1cs_matrices();
+
+        debug!("Matrices initialised");
+        let r1cs: R1CS<Field> = R1CS::new(l, r, o, Vec::<i32>::new());
+
+        debug!("R1CS initialised: {:?}", r1cs);
+        let qap = QAP::from(r1cs.clone());
+
+        debug!("QAP derived");
+        let trusted_setup: TrustedSetupOutput<ark_mnt6_753::MNT6_753> =
+            TrustedSetupOutput::new(qap.clone())?;
+
+        debug!("Trusted Setup complete");
+        let mut rng = rand::rng();
+        let x = Field::from(rng.random_range(0..1000));
+        let y = Field::from(rng.random_range(0..1000));
+        let z = Field::from(rng.random_range(0..1000));
+        let u = Field::from(rng.random_range(0..1000));
+        let r = x * y * z * u;
+        let v1 = x * y;
+        let v2 = z * u;
+        // Missing y
+        let w = vec![Field::from(1), r, x, z, u, v1, v2];
+
+        debug!("Generating proof for witness {:?}", w);
+        assert_eq!(r, x * y * z * u);
+        assert!(!r1cs.verify(&w)?);
+        assert!(!qap.verify(&w));
+        assert!(trusted_setup.prove(&w).is_err());
+
+        Ok(())
+    }
+
+    #[test]
+    fn groth16_public_witness() -> Result<(), Report> {
+        init();
+
+        let (l, right, o) = r1cs_matrices();
+
+        debug!("Matrices initialised");
+        let mut rng = rand::rng();
+        let x = Field::from(rng.random_range(0..1000));
+        let y = Field::from(rng.random_range(0..1000));
+        let z = Field::from(rng.random_range(0..1000));
+        let u = Field::from(rng.random_range(0..1000));
+        let r = x * y * z * u;
+        let v1 = x * y;
+        let v2 = z * u;
+
+        let r1cs: R1CS<Field> = R1CS::new(l, right, o, vec![Field::from(1), r]);
+
+        debug!("R1CS initialised: {:?}", r1cs);
+        let qap = QAP::from(r1cs.clone());
+
+        debug!("QAP derived");
+        let trusted_setup: TrustedSetupOutput<ark_mnt6_753::MNT6_753> =
+            TrustedSetupOutput::new(qap.clone())?;
+
+        debug!("Trusted Setup complete");
+        let w = vec![Field::from(1), r, x, y, z, u, v1, v2];
+
+        debug!("Generating proof for witness {:?}", w);
+        assert_eq!(r, x * y * z * u);
+        assert!(r1cs.verify(&w)?);
+        assert!(qap.verify(&w));
+        let proof = trusted_setup.prove(&w)?;
+
+        debug!("Proof generated");
+        assert!(proof.verify(&trusted_setup, &qap.public_witness));
         Ok(())
     }
 
@@ -439,41 +540,11 @@ mod tests {
     #[test]
     fn zero_polynomial_is_zero() -> Result<(), Report> {
         init();
-        let l = vec![
-            vec![0, 0, 0],
-            vec![0, 0, 0],
-            vec![1, 0, 0],
-            vec![0, 0, 0],
-            vec![0, 1, 0],
-            vec![0, 0, 0],
-            vec![0, 0, 1],
-            vec![0, 0, 0],
-        ];
 
-        let r = vec![
-            vec![0, 0, 0],
-            vec![0, 0, 0],
-            vec![0, 0, 0],
-            vec![1, 0, 0],
-            vec![0, 0, 0],
-            vec![0, 1, 0],
-            vec![0, 0, 0],
-            vec![0, 0, 1],
-        ];
-
-        let o = vec![
-            vec![0, 0, 0],
-            vec![0, 0, 1],
-            vec![0, 0, 0],
-            vec![0, 0, 0],
-            vec![0, 0, 0],
-            vec![0, 0, 0],
-            vec![1, 0, 0],
-            vec![0, 1, 0],
-        ];
+        let (l, r, o) = r1cs_matrices();
 
         debug!("Matrices initialised");
-        let r1cs: R1CS<Field> = R1CS::new(l, r, o, Vec::new());
+        let r1cs: R1CS<Field> = R1CS::new(l, r, o, Vec::<i32>::new());
 
         debug!("R1CS initialised: {:?}", r1cs);
         let qap = QAP::from(r1cs.clone());
@@ -511,41 +582,11 @@ mod tests {
     #[test]
     fn naive() -> Result<(), Report> {
         init();
-        let l = vec![
-            vec![0, 0, 0],
-            vec![0, 0, 0],
-            vec![1, 0, 0],
-            vec![0, 0, 0],
-            vec![0, 1, 0],
-            vec![0, 0, 0],
-            vec![0, 0, 1],
-            vec![0, 0, 0],
-        ];
 
-        let r = vec![
-            vec![0, 0, 0],
-            vec![0, 0, 0],
-            vec![0, 0, 0],
-            vec![1, 0, 0],
-            vec![0, 0, 0],
-            vec![0, 1, 0],
-            vec![0, 0, 0],
-            vec![0, 0, 1],
-        ];
-
-        let o = vec![
-            vec![0, 0, 0],
-            vec![0, 0, 1],
-            vec![0, 0, 0],
-            vec![0, 0, 0],
-            vec![0, 0, 0],
-            vec![0, 0, 0],
-            vec![1, 0, 0],
-            vec![0, 1, 0],
-        ];
+        let (l, r, o) = r1cs_matrices();
 
         debug!("Matrices initialised");
-        let r1cs: R1CS<Field> = R1CS::new(l, r, o, Vec::new());
+        let r1cs: R1CS<Field> = R1CS::new(l, r, o, Vec::<i32>::new());
 
         debug!("R1CS initialised: {:?}", r1cs);
         let qap = QAP::from(r1cs.clone());
@@ -604,41 +645,11 @@ mod tests {
     #[test]
     fn naive_plus_alpha_beta() -> Result<(), Report> {
         init();
-        let l = vec![
-            vec![0, 0, 0],
-            vec![0, 0, 0],
-            vec![1, 0, 0],
-            vec![0, 0, 0],
-            vec![0, 1, 0],
-            vec![0, 0, 0],
-            vec![0, 0, 1],
-            vec![0, 0, 0],
-        ];
 
-        let r = vec![
-            vec![0, 0, 0],
-            vec![0, 0, 0],
-            vec![0, 0, 0],
-            vec![1, 0, 0],
-            vec![0, 0, 0],
-            vec![0, 1, 0],
-            vec![0, 0, 0],
-            vec![0, 0, 1],
-        ];
-
-        let o = vec![
-            vec![0, 0, 0],
-            vec![0, 0, 1],
-            vec![0, 0, 0],
-            vec![0, 0, 0],
-            vec![0, 0, 0],
-            vec![0, 0, 0],
-            vec![1, 0, 0],
-            vec![0, 1, 0],
-        ];
+        let (l, r, o) = r1cs_matrices();
 
         debug!("Matrices initialised");
-        let r1cs: R1CS<Field> = R1CS::new(l, r, o, Vec::new());
+        let r1cs: R1CS<Field> = R1CS::new(l, r, o, Vec::<i32>::new());
 
         debug!("R1CS initialised: {:?}", r1cs);
         let qap = QAP::from(r1cs.clone());
@@ -717,41 +728,11 @@ mod tests {
     #[test]
     fn naive_plus_gamma_delta() -> Result<(), Report> {
         init();
-        let l = vec![
-            vec![0, 0, 0],
-            vec![0, 0, 0],
-            vec![1, 0, 0],
-            vec![0, 0, 0],
-            vec![0, 1, 0],
-            vec![0, 0, 0],
-            vec![0, 0, 1],
-            vec![0, 0, 0],
-        ];
 
-        let r = vec![
-            vec![0, 0, 0],
-            vec![0, 0, 0],
-            vec![0, 0, 0],
-            vec![1, 0, 0],
-            vec![0, 0, 0],
-            vec![0, 1, 0],
-            vec![0, 0, 0],
-            vec![0, 0, 1],
-        ];
-
-        let o = vec![
-            vec![0, 0, 0],
-            vec![0, 0, 1],
-            vec![0, 0, 0],
-            vec![0, 0, 0],
-            vec![0, 0, 0],
-            vec![0, 0, 0],
-            vec![1, 0, 0],
-            vec![0, 1, 0],
-        ];
+        let (l, r, o) = r1cs_matrices();
 
         debug!("Matrices initialised");
-        let r1cs: R1CS<Field> = R1CS::new(l, r, o, Vec::new());
+        let r1cs: R1CS<Field> = R1CS::new(l, r, o, Vec::<i32>::new());
 
         debug!("R1CS initialised: {:?}", r1cs);
         let qap = QAP::from(r1cs.clone());
@@ -821,14 +802,7 @@ mod tests {
 
         let delta_2 = <MNT6_753 as Pairing>::G2::generator() * delta;
         let lhs = MNT6_753::pairing(a, b).0;
-        let rhs = (MNT6_753::pairing(alpha_1, beta_2)
-            // + MNT6_753::pairing(
-            //     <MNT6_753 as Pairing>::G1::generator(),
-            //     <MNT6_753 as Pairing>::G2::generator()
-            //         * <MNT6_753 as Pairing>::ScalarField::from(1),
-            // )
-            + MNT6_753::pairing(c, delta_2))
-        .0;
+        let rhs = (MNT6_753::pairing(alpha_1, beta_2) + MNT6_753::pairing(c, delta_2)).0;
 
         assert_eq!(lhs, rhs);
 

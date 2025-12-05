@@ -1,0 +1,147 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Trait for implementing custom formatting behavior for report attachments."><title>AttachmentHandler in rootcause_internals::handlers - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-e56847b5.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="rootcause_internals" data-themes="" data-resource-suffix="" data-rustdoc-version="1.91.1 (ed61e7d7e 2025-11-07)" data-channel="1.91.1" data-search-js="search-e256b49e.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../static.files/storage-e2aeef58.js"></script><script defer src="sidebar-items.js"></script><script defer src="../../static.files/main-6dc2a7f3.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc trait"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">AttachmentHandler</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../rootcause_internals/index.html">rootcause_<wbr>internals</a><span class="version">0.10.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Attachment<wbr>Handler</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#when-to-implement" title="When to Implement">When to Implement</a></li><li><a href="#required-methods-1" title="Required Methods">Required Methods</a></li><li><a href="#optional-methods" title="Optional Methods">Optional Methods</a></li><li><a href="#examples" title="Examples">Examples</a></li></ul><h3><a href="#required-methods">Required Methods</a></h3><ul class="block"><li><a href="#tymethod.debug" title="debug">debug</a></li><li><a href="#tymethod.display" title="display">display</a></li></ul><h3><a href="#provided-methods">Provided Methods</a></h3><ul class="block"><li><a href="#method.preferred_formatting_style" title="preferred_formatting_style">preferred_formatting_style</a></li></ul><h3><a href="#dyn-compatibility">Dyn Compatibility</a></h3><h3><a href="#implementors">Implementors</a></h3></section><div id="rustdoc-modnav"><h2><a href="index.html">In rootcause_<wbr>internals::<wbr>handlers</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../index.html">rootcause_internals</a>::<wbr><a href="index.html">handlers</a></div><h1>Trait <span class="trait">Attachment<wbr>Handler</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../src/rootcause_internals/handlers.rs.html#314-406">Source</a> </span></div><pre class="rust item-decl"><code>pub trait AttachmentHandler&lt;A&gt;: 'static {
+    // Required methods
+    fn <a href="#tymethod.display" class="fn">display</a>(value: <a class="primitive" href="https://doc.rust-lang.org/1.91.1/core/primitive.reference.html">&amp;A</a>, formatter: &amp;mut <a class="struct" href="https://doc.rust-lang.org/1.91.1/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>&lt;'_&gt;) -&gt; <a class="type" href="https://doc.rust-lang.org/1.91.1/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a>;
+<span class="item-spacer"></span>    fn <a href="#tymethod.debug" class="fn">debug</a>(value: <a class="primitive" href="https://doc.rust-lang.org/1.91.1/core/primitive.reference.html">&amp;A</a>, formatter: &amp;mut <a class="struct" href="https://doc.rust-lang.org/1.91.1/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>&lt;'_&gt;) -&gt; <a class="type" href="https://doc.rust-lang.org/1.91.1/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a>;
+
+    // Provided method
+    fn <a href="#method.preferred_formatting_style" class="fn">preferred_formatting_style</a>(
+        value: <a class="primitive" href="https://doc.rust-lang.org/1.91.1/core/primitive.reference.html">&amp;A</a>,
+        report_formatting_function: <a class="enum" href="enum.FormattingFunction.html" title="enum rootcause_internals::handlers::FormattingFunction">FormattingFunction</a>,
+    ) -&gt; <a class="struct" href="struct.AttachmentFormattingStyle.html" title="struct rootcause_internals::handlers::AttachmentFormattingStyle">AttachmentFormattingStyle</a> { ... }
+}</code></pre><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Trait for implementing custom formatting behavior for report attachments.</p>
+<p>This trait defines how an attachment type should be formatted when displayed
+or debugged as part of an error report. Unlike <a href="trait.ContextHandler.html" title="trait rootcause_internals::handlers::ContextHandler"><code>ContextHandler</code></a>, this
+trait also allows specifying placement preferences (inline vs appendix).</p>
+<h2 id="when-to-implement"><a class="doc-anchor" href="#when-to-implement">§</a>When to Implement</h2>
+<p>You typically don’t need to implement this trait directly. The rootcause
+library provides built-in handlers that cover most use cases. Implement this
+trait when you need:</p>
+<ul>
+<li>Custom formatting for attachment types</li>
+<li>Special placement logic (e.g., large data in appendices)</li>
+<li>Dynamic formatting based on attachment content</li>
+</ul>
+<h2 id="required-methods-1"><a class="doc-anchor" href="#required-methods-1">§</a>Required Methods</h2>
+<ul>
+<li><a href="trait.AttachmentHandler.html#tymethod.display" title="associated function rootcause_internals::handlers::AttachmentHandler::display"><code>display</code></a>: Formats the attachment for
+display output</li>
+<li><a href="trait.AttachmentHandler.html#tymethod.debug" title="associated function rootcause_internals::handlers::AttachmentHandler::debug"><code>debug</code></a>: Formats the attachment for debug
+output</li>
+</ul>
+<h2 id="optional-methods"><a class="doc-anchor" href="#optional-methods">§</a>Optional Methods</h2>
+<ul>
+<li><a href="trait.AttachmentHandler.html#method.preferred_formatting_style" title="associated function rootcause_internals::handlers::AttachmentHandler::preferred_formatting_style"><code>preferred_formatting_style</code></a>:
+Specifies formatting preferences including placement (inline/appendix) and
+whether to use display or debug formatting. The default implementation prefers
+inline display formatting.</li>
+</ul>
+<h2 id="examples"><a class="doc-anchor" href="#examples">§</a>Examples</h2>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>rootcause_internals::handlers::{
+    AttachmentFormattingPlacement, AttachmentFormattingStyle, AttachmentHandler,
+    FormattingFunction,
+};
+
+<span class="comment">// Attachment type with potentially large data
+</span><span class="kw">struct </span>LargeData {
+    records: Vec&lt;String&gt;,
+}
+
+<span class="comment">// Handler that moves large attachments to appendix
+</span><span class="kw">struct </span>LargeDataHandler;
+
+<span class="kw">impl </span>AttachmentHandler&lt;LargeData&gt; <span class="kw">for </span>LargeDataHandler {
+    <span class="kw">fn </span>display(attachment: <span class="kw-2">&amp;</span>LargeData, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">"{} records"</span>, attachment.records.len())
+    }
+
+    <span class="kw">fn </span>debug(attachment: <span class="kw-2">&amp;</span>LargeData, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">"LargeData {{ {} records }}"</span>, attachment.records.len())
+    }
+
+    <span class="kw">fn </span>preferred_formatting_style(
+        attachment: <span class="kw-2">&amp;</span>LargeData,
+        _report_formatting: FormattingFunction,
+    ) -&gt; AttachmentFormattingStyle {
+        <span class="kw">if </span>attachment.records.len() &gt; <span class="number">10 </span>{
+            <span class="comment">// Large data goes to appendix
+            </span>AttachmentFormattingStyle {
+                placement: AttachmentFormattingPlacement::Appendix {
+                    appendix_name: <span class="string">"Large Data Records"</span>,
+                },
+                function: FormattingFunction::Display,
+                priority: <span class="number">0</span>,
+            }
+        } <span class="kw">else </span>{
+            <span class="comment">// Small data shows inline
+            </span>AttachmentFormattingStyle::default()
+        }
+    }
+}</code></pre></div></div></details><h2 id="required-methods" class="section-header">Required Methods<a href="#required-methods" class="anchor">§</a></h2><div class="methods"><details class="toggle method-toggle" open><summary><section id="tymethod.display" class="method"><a class="src rightside" href="../../src/rootcause_internals/handlers.rs.html#342">Source</a><h4 class="code-header">fn <a href="#tymethod.display" class="fn">display</a>(value: <a class="primitive" href="https://doc.rust-lang.org/1.91.1/core/primitive.reference.html">&amp;A</a>, formatter: &amp;mut <a class="struct" href="https://doc.rust-lang.org/1.91.1/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>&lt;'_&gt;) -&gt; <a class="type" href="https://doc.rust-lang.org/1.91.1/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></h4></section></summary><div class="docblock"><p>Formats the attachment using display-style formatting.</p>
+<p>This method is called when the attachment needs to be displayed as part
+of an error report. It should produce human-readable output suitable
+for end users.</p>
+<h5 id="examples-1"><a class="doc-anchor" href="#examples-1">§</a>Examples</h5>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>rootcause_internals::handlers::AttachmentHandler;
+
+<span class="kw">struct </span>ConfigData {
+    key: String,
+    value: String,
+}
+
+<span class="kw">struct </span>ConfigHandler;
+
+<span class="kw">impl </span>AttachmentHandler&lt;ConfigData&gt; <span class="kw">for </span>ConfigHandler {
+    <span class="kw">fn </span>display(attachment: <span class="kw-2">&amp;</span>ConfigData, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">"{} = {}"</span>, attachment.key, attachment.value)
+    }
+}</code></pre></div></div></details><details class="toggle method-toggle" open><summary><section id="tymethod.debug" class="method"><a class="src rightside" href="../../src/rootcause_internals/handlers.rs.html#348">Source</a><h4 class="code-header">fn <a href="#tymethod.debug" class="fn">debug</a>(value: <a class="primitive" href="https://doc.rust-lang.org/1.91.1/core/primitive.reference.html">&amp;A</a>, formatter: &amp;mut <a class="struct" href="https://doc.rust-lang.org/1.91.1/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>&lt;'_&gt;) -&gt; <a class="type" href="https://doc.rust-lang.org/1.91.1/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></h4></section></summary><div class="docblock"><p>Formats the attachment using debug-style formatting.</p>
+<p>This method is called when the attachment needs to be debug-formatted.
+It should produce detailed output suitable for developers.</p>
+</div></details></div><h2 id="provided-methods" class="section-header">Provided Methods<a href="#provided-methods" class="anchor">§</a></h2><div class="methods"><details class="toggle method-toggle" open><summary><section id="method.preferred_formatting_style" class="method"><a class="src rightside" href="../../src/rootcause_internals/handlers.rs.html#399-405">Source</a><h4 class="code-header">fn <a href="#method.preferred_formatting_style" class="fn">preferred_formatting_style</a>(
+    value: <a class="primitive" href="https://doc.rust-lang.org/1.91.1/core/primitive.reference.html">&amp;A</a>,
+    report_formatting_function: <a class="enum" href="enum.FormattingFunction.html" title="enum rootcause_internals::handlers::FormattingFunction">FormattingFunction</a>,
+) -&gt; <a class="struct" href="struct.AttachmentFormattingStyle.html" title="struct rootcause_internals::handlers::AttachmentFormattingStyle">AttachmentFormattingStyle</a></h4></section></summary><div class="docblock"><p>Specifies the preferred formatting style and placement for this
+attachment.</p>
+<p>This method allows the handler to control:</p>
+<ul>
+<li><strong>Placement</strong>: Whether the attachment appears inline, in an appendix,
+or is hidden</li>
+<li><strong>Formatting</strong>: Whether to use display or debug formatting</li>
+<li><strong>Priority</strong>: The order in which attachments are displayed (higher =
+earlier)</li>
+</ul>
+<p>The default implementation returns inline display formatting with
+priority 0.</p>
+<h5 id="examples-2"><a class="doc-anchor" href="#examples-2">§</a>Examples</h5>
+<p>Attachment that hides sensitive data:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>rootcause_internals::handlers::{
+    AttachmentFormattingPlacement, AttachmentFormattingStyle, AttachmentHandler,
+    FormattingFunction,
+};
+
+<span class="kw">struct </span>ApiKey(String);
+
+<span class="kw">struct </span>SecureHandler;
+
+<span class="kw">impl </span>AttachmentHandler&lt;ApiKey&gt; <span class="kw">for </span>SecureHandler {
+    <span class="kw">fn </span>display(_attachment: <span class="kw-2">&amp;</span>ApiKey, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">"[REDACTED]"</span>)
+    }
+
+    <span class="kw">fn </span>debug(_attachment: <span class="kw-2">&amp;</span>ApiKey, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">"ApiKey([REDACTED])"</span>)
+    }
+
+    <span class="kw">fn </span>preferred_formatting_style(
+        _attachment: <span class="kw-2">&amp;</span>ApiKey,
+        _report_formatting: FormattingFunction,
+    ) -&gt; AttachmentFormattingStyle {
+        <span class="comment">// Hide this attachment completely in production
+        </span>AttachmentFormattingStyle {
+            placement: AttachmentFormattingPlacement::Hidden,
+            function: FormattingFunction::Display,
+            priority: <span class="number">0</span>,
+        }
+    }
+}</code></pre></div></div></details></div><h2 id="dyn-compatibility" class="section-header">Dyn Compatibility<a href="#dyn-compatibility" class="anchor">§</a></h2><div class="dyn-compatibility-info"><p>This trait is <b>not</b> <a href="https://doc.rust-lang.org/1.91.1/reference/items/traits.html#dyn-compatibility">dyn compatible</a>.</p><p><i>In older versions of Rust, dyn compatibility was called "object safety", so this trait is not object safe.</i></p></div><h2 id="implementors" class="section-header">Implementors<a href="#implementors" class="anchor">§</a></h2><div id="implementors-list"></div><script src="../../trait.impl/rootcause_internals/handlers/trait.AttachmentHandler.js" async></script></section></div></main></body></html>

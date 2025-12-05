@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["debug_attachment_hooks","register_attachment_hook"],"struct":["AttachmentParent"],"trait":["AttachmentFormattingOverride"]};

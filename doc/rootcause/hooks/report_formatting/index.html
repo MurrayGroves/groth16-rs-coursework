@@ -1,0 +1,50 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Report formatting hooks for customizing the overall appearance of reports."><title>rootcause::hooks::report_formatting - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e56847b5.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rootcause" data-themes="" data-resource-suffix="" data-rustdoc-version="1.91.1 (ed61e7d7e 2025-11-07)" data-channel="1.91.1" data-search-js="search-e256b49e.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../../static.files/storage-e2aeef58.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../../static.files/main-6dc2a7f3.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">Module report_formatting</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../rootcause/index.html">rootcause</a><span class="version">0.10.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Module report_<wbr>formatting</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#built-in-formatters" title="Built-in Formatters">Built-in Formatters</a></li><li><a href="#per-report-formatting" title="Per-Report Formatting">Per-Report Formatting</a></li><li><a href="#custom-formatters" title="Custom Formatters">Custom Formatters</a></li></ul><h3><a href="#traits">Module Items</a></h3><ul class="block"><li><a href="#traits" title="Traits">Traits</a></li><li><a href="#functions" title="Functions">Functions</a></li></ul></section><div id="rustdoc-modnav"><h2><a href="../index.html">In rootcause::<wbr>hooks</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../../index.html">rootcause</a>::<wbr><a href="../index.html">hooks</a></div><h1>Module <span>report_<wbr>formatting</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../../src/rootcause/hooks/report_formatting.rs.html#1-296">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Report formatting hooks for customizing the overall appearance of reports.</p>
+<p>This module provides hooks that allow you to completely customize how entire
+reports are formatted, including their structure, colors, and layout.</p>
+<h2 id="built-in-formatters"><a class="doc-anchor" href="#built-in-formatters">§</a>Built-in Formatters</h2>
+<p>By default, rootcause uses <a href="../builtin_hooks/report_formatter/struct.DefaultReportFormatter.html#associatedconstant.UNICODE_ANSI" title="associated constant rootcause::hooks::builtin_hooks::report_formatter::DefaultReportFormatter::UNICODE_ANSI"><code>DefaultReportFormatter::UNICODE_ANSI</code></a>, which
+provides Unicode box-drawing characters with ANSI color codes for modern
+terminals. An ASCII-only variant is also available:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>rootcause::{
+    hooks::{
+        builtin_hooks::report_formatter::DefaultReportFormatter,
+        report_formatting::register_report_formatter_hook,
+    },
+    prelude::<span class="kw-2">*</span>,
+};
+
+<span class="comment">// Switch to ASCII-only output globally (affects all reports)
+</span>register_report_formatter_hook(DefaultReportFormatter::ASCII_NO_ANSI);
+
+<span class="kw">let </span>report = <span class="macro">report!</span>(<span class="string">"database connection failed"</span>);
+<span class="macro">println!</span>(<span class="string">"{}"</span>, report);</code></pre></div><h2 id="per-report-formatting"><a class="doc-anchor" href="#per-report-formatting">§</a>Per-Report Formatting</h2>
+<p>You can also apply a formatter to a specific report without changing the
+global default using <a href="../../struct.Report.html#method.format_with_hook" title="method rootcause::Report::format_with_hook"><code>Report::format_with_hook</code></a>:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>rootcause::{hooks::builtin_hooks::report_formatter::DefaultReportFormatter, prelude::<span class="kw-2">*</span>};
+
+<span class="kw">let </span>report = <span class="macro">report!</span>(<span class="string">"parsing error"</span>);
+
+<span class="comment">// This report uses the global formatter (Unicode + ANSI by default)
+</span><span class="macro">println!</span>(<span class="string">"{}"</span>, report);
+
+<span class="comment">// This uses ASCII-only for this specific report
+</span><span class="macro">println!</span>(
+    <span class="string">"{}"</span>,
+    report.format_with_hook(<span class="kw-2">&amp;</span>DefaultReportFormatter::ASCII_NO_ANSI)
+);</code></pre></div>
+<p>This is useful when you need different output formats in different contexts,
+such as:</p>
+<ul>
+<li>ASCII-only for log files</li>
+<li>Full Unicode+ANSI for terminal output</li>
+<li>Custom formatting for specific error types</li>
+</ul>
+<h2 id="custom-formatters"><a class="doc-anchor" href="#custom-formatters">§</a>Custom Formatters</h2>
+<p>For complete control over report formatting, you can implement the
+<a href="trait.ReportFormatterHook.html" title="trait rootcause::hooks::report_formatting::ReportFormatterHook"><code>ReportFormatterHook</code></a> trait. See the trait documentation for details and
+examples of implementing custom formatters.</p>
+<p>The <a href="../builtin_hooks/report_formatter/struct.DefaultReportFormatter.html" title="struct rootcause::hooks::builtin_hooks::report_formatter::DefaultReportFormatter"><code>DefaultReportFormatter</code></a> source code also serves as a comprehensive
+example of a full-featured formatter implementation.</p>
+</div></details><h2 id="traits" class="section-header">Traits<a href="#traits" class="anchor">§</a></h2><dl class="item-table"><dt><a class="trait" href="trait.ReportFormatterHook.html" title="trait rootcause::hooks::report_formatting::ReportFormatterHook">Report<wbr>Formatter<wbr>Hook</a></dt><dd>A hook for customizing how reports are formatted and displayed.</dd></dl><h2 id="functions" class="section-header">Functions<a href="#functions" class="anchor">§</a></h2><dl class="item-table"><dt><a class="fn" href="fn.register_report_formatter_hook.html" title="fn rootcause::hooks::report_formatting::register_report_formatter_hook">register_<wbr>report_<wbr>formatter_<wbr>hook</a></dt><dd>Registers a global report formatter hook.</dd></dl></section></div></main></body></html>

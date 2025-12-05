@@ -1,0 +1,40 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Default report formatter implementation for the rootcause error handling library."><title>rootcause::hooks::builtin_hooks::report_formatter - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-e56847b5.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="rootcause" data-themes="" data-resource-suffix="" data-rustdoc-version="1.91.1 (ed61e7d7e 2025-11-07)" data-channel="1.91.1" data-search-js="search-e256b49e.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../../../static.files/storage-e2aeef58.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../../../static.files/main-6dc2a7f3.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">Module report_formatter</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../../rootcause/index.html">rootcause</a><span class="version">0.10.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Module report_<wbr>formatter</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#usage" title="Usage">Usage</a></li><li><a href="#configuration-structures" title="Configuration Structures">Configuration Structures</a></li></ul><h3><a href="#structs">Module Items</a></h3><ul class="block"><li><a href="#structs" title="Structs">Structs</a></li></ul></section><div id="rustdoc-modnav"><h2><a href="../index.html">In rootcause::<wbr>hooks::<wbr>builtin_<wbr>hooks</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../../../index.html">rootcause</a>::<wbr><a href="../../index.html">hooks</a>::<wbr><a href="../index.html">builtin_hooks</a></div><h1>Module <span>report_<wbr>formatter</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../../../src/rootcause/hooks/builtin_hooks/report_formatter.rs.html#1-964">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Default report formatter implementation for the rootcause error handling
+library.</p>
+<p>This module provides <a href="struct.DefaultReportFormatter.html" title="struct rootcause::hooks::builtin_hooks::report_formatter::DefaultReportFormatter"><code>DefaultReportFormatter</code></a>, a comprehensive and
+configurable report formatter that handles the visual presentation of error
+reports with hierarchical structures, attachments, and appendices.</p>
+<p>The formatter supports multiple output styles:</p>
+<ul>
+<li><strong>Unicode with ANSI colors</strong> (<a href="struct.DefaultReportFormatter.html#associatedconstant.UNICODE_ANSI" title="associated constant rootcause::hooks::builtin_hooks::report_formatter::DefaultReportFormatter::UNICODE_ANSI"><code>DefaultReportFormatter::UNICODE_ANSI</code></a>) -
+Rich visual experience for modern terminals</li>
+<li><strong>ASCII-only</strong> (<a href="struct.DefaultReportFormatter.html#associatedconstant.ASCII_NO_ANSI" title="associated constant rootcause::hooks::builtin_hooks::report_formatter::DefaultReportFormatter::ASCII_NO_ANSI"><code>DefaultReportFormatter::ASCII_NO_ANSI</code></a>) - Compatible
+with basic terminals and text-only outputs</li>
+</ul>
+<h2 id="usage"><a class="doc-anchor" href="#usage">§</a>Usage</h2>
+<p>This formatter is the one used by default when no other formatter is
+registered. It is also possible to explicitly register it:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>rootcause::hooks::{
+    builtin_hooks::report_formatter::DefaultReportFormatter,
+    report_formatting::register_report_formatter_hook,
+};
+
+<span class="comment">// Use the default Unicode + ANSI configuration
+</span>register_report_formatter_hook(DefaultReportFormatter::default());
+
+<span class="comment">// Or use ASCII-only for compatibility
+</span>register_report_formatter_hook(DefaultReportFormatter::ASCII_NO_ANSI);</code></pre></div><h2 id="configuration-structures"><a class="doc-anchor" href="#configuration-structures">§</a>Configuration Structures</h2>
+<p>The formatter uses a hierarchy of configuration structures:</p>
+<ul>
+<li><a href="struct.LineFormatting.html" title="struct rootcause::hooks::builtin_hooks::report_formatter::LineFormatting"><code>LineFormatting</code></a> - Basic line prefix/suffix formatting</li>
+<li><a href="struct.ItemFormatting.html" title="struct rootcause::hooks::builtin_hooks::report_formatter::ItemFormatting"><code>ItemFormatting</code></a> - Multi-line item formatting with different rules for
+first/middle/last lines</li>
+<li><a href="struct.NodeConfig.html" title="struct rootcause::hooks::builtin_hooks::report_formatter::NodeConfig"><code>NodeConfig</code></a> - Hierarchical node formatting with header and child
+indentation</li>
+<li><a href="struct.DefaultReportFormatter.html" title="struct rootcause::hooks::builtin_hooks::report_formatter::DefaultReportFormatter"><code>DefaultReportFormatter</code></a> - Main configuration struct combining all
+formatting options</li>
+</ul>
+</div></details><h2 id="structs" class="section-header">Structs<a href="#structs" class="anchor">§</a></h2><dl class="item-table"><dt><a class="struct" href="struct.DefaultReportFormatter.html" title="struct rootcause::hooks::builtin_hooks::report_formatter::DefaultReportFormatter">Default<wbr>Report<wbr>Formatter</a></dt><dd>The default report formatter implementation that provides comprehensive
+formatting for error reports with configurable styling and layout options.</dd><dt><a class="struct" href="struct.ItemFormatting.html" title="struct rootcause::hooks::builtin_hooks::report_formatter::ItemFormatting">Item<wbr>Formatting</a></dt><dd>Configuration for formatting items that may span multiple lines, with
+different formatting rules based on the line’s position within the item.</dd><dt><a class="struct" href="struct.LineFormatting.html" title="struct rootcause::hooks::builtin_hooks::report_formatter::LineFormatting">Line<wbr>Formatting</a></dt><dd>Configuration for formatting individual lines with prefix and suffix text.</dd><dt><a class="struct" href="struct.NodeConfig.html" title="struct rootcause::hooks::builtin_hooks::report_formatter::NodeConfig">Node<wbr>Config</a></dt><dd>Configuration for formatting hierarchical nodes that contain both header
+content and child elements with specific indentation.</dd></dl></section></div></main></body></html>

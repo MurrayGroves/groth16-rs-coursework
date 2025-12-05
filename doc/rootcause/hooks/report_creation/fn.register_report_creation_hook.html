@@ -1,0 +1,47 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Registers a report creation hook that will be called whenever a report is created."><title>register_report_creation_hook in rootcause::hooks::report_creation - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../static.files/rustdoc-e56847b5.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="rootcause" data-themes="" data-resource-suffix="" data-rustdoc-version="1.91.1 (ed61e7d7e 2025-11-07)" data-channel="1.91.1" data-search-js="search-e256b49e.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../../static.files/storage-e2aeef58.js"></script><script defer src="sidebar-items.js"></script><script defer src="../../../static.files/main-6dc2a7f3.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-044be391.svg"></head><body class="rustdoc fn"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">register_report_creation_hook</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../rootcause/index.html">rootcause</a><span class="version">0.10.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">register_<wbr>report_<wbr>creation_<wbr>hook</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#registration-order" title="Registration Order">Registration Order</a></li><li><a href="#performance-considerations" title="Performance Considerations">Performance Considerations</a></li><li><a href="#examples" title="Examples">Examples</a></li></ul></section><div id="rustdoc-modnav"><h2><a href="index.html">In rootcause::<wbr>hooks::<wbr>report_<wbr>creation</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../../index.html">rootcause</a>::<wbr><a href="../index.html">hooks</a>::<wbr><a href="index.html">report_creation</a></div><h1>Function <span class="fn">register_<wbr>report_<wbr>creation_<wbr>hook</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../../src/rootcause/hooks/report_creation.rs.html#353-362">Source</a> </span></div><pre class="rust item-decl"><code>pub fn register_report_creation_hook&lt;H&gt;(hook: H)<div class="where">where
+    H: <a class="trait" href="trait.ReportCreationHook.html" title="trait rootcause::hooks::report_creation::ReportCreationHook">ReportCreationHook</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Send.html" title="trait core::marker::Send">Send</a> + <a class="trait" href="https://doc.rust-lang.org/1.91.1/core/marker/trait.Sync.html" title="trait core::marker::Sync">Sync</a> + 'static,</div></code></pre><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Registers a report creation hook that will be called whenever a report is
+created.</p>
+<p>Once registered, the hook will be automatically invoked for every report
+that gets created in the application.</p>
+<h2 id="registration-order"><a class="doc-anchor" href="#registration-order">§</a>Registration Order</h2>
+<p>Hooks are called in the order they were registered. Earlier registered hooks
+will execute before later ones.</p>
+<h2 id="performance-considerations"><a class="doc-anchor" href="#performance-considerations">§</a>Performance Considerations</h2>
+<p>Registered hooks will be called for <em>every</em> report creation, so they should
+be designed to be fast. Heavy operations in hooks can significantly impact
+the performance of error reporting throughout the application.</p>
+<h2 id="examples"><a class="doc-anchor" href="#examples">§</a>Examples</h2>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>rootcause::{
+    ReportMut,
+    hooks::report_creation::{ReportCreationHook, register_report_creation_hook},
+    markers::{Local, SendSync},
+    prelude::<span class="kw-2">*</span>,
+    report_attachment::ReportAttachment,
+};
+
+<span class="kw">struct </span>CountingHook {
+    counter: std::sync::atomic::AtomicUsize,
+}
+
+<span class="kw">impl </span>ReportCreationHook <span class="kw">for </span>CountingHook {
+    <span class="kw">fn </span>on_local_creation(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>report: ReportMut&lt;<span class="lifetime">'_</span>, <span class="kw">dyn </span>std::any::Any, Local&gt;) {
+        <span class="kw">let </span>count = <span class="self">self
+            </span>.counter
+            .fetch_add(<span class="number">1</span>, std::sync::atomic::Ordering::Relaxed);
+        <span class="kw">let </span>attachment = <span class="macro">report_attachment!</span>(<span class="string">"Report #{}"</span>, count);
+        report.attachments_mut().push(attachment.into());
+    }
+
+    <span class="kw">fn </span>on_sendsync_creation(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>report: ReportMut&lt;<span class="lifetime">'_</span>, <span class="kw">dyn </span>std::any::Any, SendSync&gt;) {
+        <span class="kw">let </span>count = <span class="self">self
+            </span>.counter
+            .fetch_add(<span class="number">1</span>, std::sync::atomic::Ordering::Relaxed);
+        <span class="kw">let </span>attachment = <span class="macro">report_attachment!</span>(<span class="string">"Report #{}"</span>, count);
+        report.attachments_mut().push(attachment.into());
+    }
+}
+
+<span class="comment">// Register the hook - it will now be called for all future reports
+</span>register_report_creation_hook(CountingHook {
+    counter: std::sync::atomic::AtomicUsize::new(<span class="number">0</span>),
+});</code></pre></div></div></details></section></div></main></body></html>

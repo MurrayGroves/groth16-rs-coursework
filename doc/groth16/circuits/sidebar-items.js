@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["QAP","R1CS"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"macro":["bail","report","report_attachment"],"mod":["compat","handlers","hooks","markers","preformatted","prelude","report_attachment","report_attachments","report_collection"],"struct":["Report","ReportIter","ReportMut","ReportRef"],"trait":["IntoReport","IntoReportCollection"]};

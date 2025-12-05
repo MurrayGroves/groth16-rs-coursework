@@ -1,0 +1,51 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Context formatting override system for customizing how error report contexts are displayed."><title>rootcause::hooks::formatting_overrides::context - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../../../static.files/rustdoc-e56847b5.css"><meta name="rustdoc-vars" data-root-path="../../../../" data-static-root-path="../../../../static.files/" data-current-crate="rootcause" data-themes="" data-resource-suffix="" data-rustdoc-version="1.91.1 (ed61e7d7e 2025-11-07)" data-channel="1.91.1" data-search-js="search-e256b49e.js" data-stringdex-js="stringdex-c3e638e9.js" data-settings-js="settings-c38705f0.js" ><script src="../../../../static.files/storage-e2aeef58.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../../../static.files/main-6dc2a7f3.js"></script><noscript><link rel="stylesheet" href="../../../../static.files/noscript-263c88ec.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../../../static.files/favicon-044be391.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><rustdoc-topbar><h2><a href="#">Module context</a></h2></rustdoc-topbar><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../../rootcause/index.html">rootcause</a><span class="version">0.10.0</span></h2></div><div class="sidebar-elems"><section id="rustdoc-toc"><h2 class="location"><a href="#">Module context</a></h2><h3><a href="#">Sections</a></h3><ul class="block top-toc"><li><a href="#key-components" title="Key Components">Key Components</a></li><li><a href="#example" title="Example">Example</a></li></ul><h3><a href="#traits">Module Items</a></h3><ul class="block"><li><a href="#traits" title="Traits">Traits</a></li><li><a href="#functions" title="Functions">Functions</a></li></ul></section><div id="rustdoc-modnav"><h2><a href="../index.html">In rootcause::<wbr>hooks::<wbr>formatting_<wbr>overrides</a></h2></div></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><div class="width-limiter"><section id="main-content" class="content"><div class="main-heading"><div class="rustdoc-breadcrumbs"><a href="../../../index.html">rootcause</a>::<wbr><a href="../../index.html">hooks</a>::<wbr><a href="../index.html">formatting_overrides</a></div><h1>Module <span>context</span>&nbsp;<button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><rustdoc-toolbar></rustdoc-toolbar><span class="sub-heading"><a class="src" href="../../../../src/rootcause/hooks/formatting_overrides/context.rs.html#1-604">Source</a> </span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Context formatting override system for customizing how error report contexts
+are displayed.</p>
+<p>This module provides a hook system that allows customization of how contexts
+(the main error types) are formatted in error reports. By registering hooks
+for specific context types, you can override the default Display and Debug
+formatting behavior to provide more detailed, context-aware, or
+domain-specific formatting.</p>
+<h2 id="key-components"><a class="doc-anchor" href="#key-components">§</a>Key Components</h2>
+<ul>
+<li><a href="trait.ContextFormattingOverride.html" title="trait rootcause::hooks::formatting_overrides::context::ContextFormattingOverride"><code>ContextFormattingOverride</code></a> - Trait for implementing custom context
+formatting</li>
+<li><a href="fn.register_context_hook.html" title="fn rootcause::hooks::formatting_overrides::context::register_context_hook"><code>register_context_hook</code></a> - Function to register formatting overrides for
+specific types</li>
+<li><a href="fn.debug_context_hooks.html" title="fn rootcause::hooks::formatting_overrides::context::debug_context_hooks"><code>debug_context_hooks</code></a> - Utility to inspect registered hooks</li>
+</ul>
+<h2 id="example"><a class="doc-anchor" href="#example">§</a>Example</h2>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>core::fmt;
+
+<span class="kw">use </span>rootcause::{
+    ReportRef,
+    hooks::formatting_overrides::context::{ContextFormattingOverride, register_context_hook},
+    markers::{Local, Uncloneable},
+};
+
+<span class="kw">struct </span>DatabaseError {
+    table: String,
+    operation: String,
+    details: String,
+}
+
+<span class="kw">struct </span>DatabaseErrorFormatter;
+
+<span class="kw">impl </span>ContextFormattingOverride&lt;DatabaseError&gt; <span class="kw">for </span>DatabaseErrorFormatter {
+    <span class="kw">fn </span>display(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        report: ReportRef&lt;<span class="lifetime">'_</span>, DatabaseError, Uncloneable, Local&gt;,
+        f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">'_</span>&gt;,
+    ) -&gt; fmt::Result {
+        <span class="kw">let </span>err = report.current_context();
+        <span class="macro">write!</span>(
+            f,
+            <span class="string">"Database {} failed on table '{}': {}"</span>,
+            err.operation, err.table, err.details
+        )
+    }
+}
+
+<span class="comment">// Register the custom formatter
+</span>register_context_hook::&lt;DatabaseError, <span class="kw">_</span>&gt;(DatabaseErrorFormatter);</code></pre></div></div></details><h2 id="traits" class="section-header">Traits<a href="#traits" class="anchor">§</a></h2><dl class="item-table"><dt><a class="trait" href="trait.ContextFormattingOverride.html" title="trait rootcause::hooks::formatting_overrides::context::ContextFormattingOverride">Context<wbr>Formatting<wbr>Override</a></dt><dd>Trait for customizing how contexts of a specific type are formatted in error
+reports.</dd></dl><h2 id="functions" class="section-header">Functions<a href="#functions" class="anchor">§</a></h2><dl class="item-table"><dt><a class="fn" href="fn.debug_context_hooks.html" title="fn rootcause::hooks::formatting_overrides::context::debug_context_hooks">debug_<wbr>context_<wbr>hooks</a></dt><dd>Calls a function for each registered context formatting hook for debugging
+purposes.</dd><dt><a class="fn" href="fn.register_context_hook.html" title="fn rootcause::hooks::formatting_overrides::context::register_context_hook">register_<wbr>context_<wbr>hook</a></dt><dd>Registers a formatting override hook for contexts of type <code>C</code>.</dd></dl></section></div></main></body></html>
