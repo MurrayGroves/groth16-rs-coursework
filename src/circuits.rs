@@ -1,8 +1,10 @@
 use crate::polynomial::Polynomial;
 use ark_ff::FftField;
+use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use log::debug;
 use rand::Rng;
 use rootcause::{Report, report};
+use serde::{Deserialize, Serialize};
 use std::cmp::max;
 use std::iter::zip;
 
@@ -58,7 +60,9 @@ impl<S: FftField> R1CS<S> {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(
+    Debug, PartialEq, Eq, Clone, Serialize, Deserialize, CanonicalDeserialize, CanonicalSerialize,
+)]
 pub struct QAP<S>
 where
     S: FftField,

@@ -8,12 +8,12 @@ ark-ec = "*"
 ark-mnt6-753 = "*"
 ark-std = "*"
 ark-ff = "*"
+ark-serialize = { version = "*", features = ["derive"] }
 
-ndarray = "*"
-
-rand = "0.9"
-rootcause = { version = "0.10", features = ["backtrace"] }
+serde = { version = "*", features = ["derive"] }
 itertools = "*"
-clap = { version = "4.5.53", features = ["derive"] }
+rand = "0.9"
+
+rootcause = { version = "0.10", features = ["backtrace"] }
 log = "0.4.28"
 env_logger = "0.11.8"

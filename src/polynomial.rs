@@ -1,15 +1,19 @@
 use ark_ec::CurveGroup;
 use ark_ff::Field;
+use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use ark_std::iterable::Iterable;
 use log::{debug, trace};
 use rootcause::prelude::ResultExt;
 use rootcause::{Report, bail, report};
+use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::fmt::Debug;
 use std::iter::{Sum, zip};
 use std::ops::{Add, AddAssign, Div, Mul, MulAssign, Sub, SubAssign};
 
-#[derive(Clone, PartialEq, Eq, Debug)]
+#[derive(
+    Clone, PartialEq, Eq, Debug, Serialize, Deserialize, CanonicalSerialize, CanonicalDeserialize,
+)]
 pub struct Polynomial<F>
 where
     F: Field,

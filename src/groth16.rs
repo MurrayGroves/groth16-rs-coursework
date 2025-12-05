@@ -4,13 +4,16 @@ use crate::polynomial::Polynomial;
 use ark_ec::PrimeGroup;
 use ark_ec::pairing::Pairing;
 use ark_ff::fields::Field;
+use ark_serialize::{CanonicalDeserialize, CanonicalSerialize, Compress, Validate};
 use itertools::izip;
 use log::debug;
 use rand::SeedableRng;
 use rootcause::prelude::ResultExt;
 use rootcause::{Report, bail, report};
+use serde::{Deserialize, Serialize};
 use std::iter::zip;
 
+#[derive(Deserialize, Serialize)]
 struct Proof<C: Pairing> {
     a: C::G1,
     b: C::G2,
@@ -48,7 +51,29 @@ impl<C: Pairing> Proof<C> {
     }
 }
 
+fn ark_se<S, A: CanonicalSerialize>(a: &A, s: S) -> Result<S::Ok, S::Error>
+where
+    S: serde::Serializer,
+{
+    // ark_se and ark_de taken from https://github.com/arkworks-rs/algebra/issues/178#issuecomment-1413219278
+    let mut bytes = vec![];
+    a.serialize_with_mode(&mut bytes, Compress::Yes)
+        .map_err(serde::ser::Error::custom)?;
+    s.serialize_bytes(&bytes)
+}
+
+fn ark_de<'de, D, A: CanonicalDeserialize>(data: D) -> Result<A, D::Error>
+where
+    D: serde::de::Deserializer<'de>,
+{
+    let s: Vec<u8> = serde::de::Deserialize::deserialize(data)?;
+    let a = A::deserialize_with_mode(s.as_slice(), Compress::Yes, Validate::Yes);
+    a.map_err(serde::de::Error::custom)
+}
+
+#[derive(Serialize, Deserialize)]
 struct TrustedSetupOutput<C: Pairing> {
+    #[serde(serialize_with = "ark_se", deserialize_with = "ark_de")]
     qap: QAP<C::ScalarField>,
     alpha: C::G1,
     beta_1: C::G1,
